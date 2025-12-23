@@ -1,4 +1,5 @@
 name: CI
+name: CI
 
 on:
   push:
@@ -12,23 +13,35 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest] #[ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Build (Invoke-Build)
-        # Use PowerShell Core on all platforms
+      - name: Ensure PowerShell modules (PSDepend, InvokeBuild, Pester)
         shell: pwsh
         run: |
           Set-StrictMode -Version Latest
-          # Ensure the build script is executable on Unix
-          if ($IsLinux -or $IsMacOS) { chmod +x ./build.ps1 -ErrorAction SilentlyContinue }
-          ./PSRedfishClient.Build.ps1 -Task build
+          Write-Host 'Installing required modules to CurrentUser scope if missing...'
+          $modules = 'PSDepend','InvokeBuild','Pester'
+          foreach ($m in $modules) {
+            if (-not (Get-Module -ListAvailable -Name $m)) {
+              Install-Module -Name $m -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+            }
+          }
 
-      - name: Upload packaged artifact
+      - name: Run build via Invoke-Build
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          Import-Module InvokeBuild -ErrorAction Stop
+          # Run the repository build script using Invoke-Build; the script defines tasks
+          Invoke-Build -Script ./PSRedfishClient.Build.ps1 -Task Default
+
+      - name: Upload build artifacts (if any)
         uses: actions/upload-artifact@v4
         with:
-          name: PSRedFishClient-package
-          path: artifacts/PSRedFishClient.zip
+          name: PSRedFishClient-build
+          path: build/**
+          if-no-files-found: warn
