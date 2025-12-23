@@ -36,7 +36,7 @@ jobs:
           Set-StrictMode -Version Latest
           Import-Module InvokeBuild -ErrorAction Stop
           # Run the repository build script using Invoke-Build; the script defines tasks
-          ./PSRedfishClient.Build.ps1
+          Invoke-Build
 
       - name: Upload build artifacts (if any)
         uses: actions/upload-artifact@v4
