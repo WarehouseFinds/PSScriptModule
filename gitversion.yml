@@ -5,17 +5,17 @@ patch-version-bump-message: '\s?(fix|patch)'
 no-bump-message: '\+semver:\s?(none|skip)'
 branches:
   main:
-    tag: 
+    label: 
     increment: Patch
     regex: ^master$|^main$
   feature:
-    tag: preview
+    label: preview
     increment: Minor
     regex: ^features?[/-]
   hotfix:
-    tag: preview
+    label: preview
     increment: Patch
     regex: ^hotfix(es)?[/-]|^patch?[/-]
   support:
-    tag: preview
+    label: preview
     increment: Patch
