@@ -34,7 +34,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v4.2.0
         with:
-          versionSpec: '6.5.1'
+          versionSpec: '5.1.12'
           preferLatestVersion: false
 
       - name: Determine Version
