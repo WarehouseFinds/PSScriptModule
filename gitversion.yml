@@ -1,6 +1,6 @@
 assembly-versioning-scheme: MajorMinorPatch
 assembly-file-versioning-scheme: MajorMinorPatch
-assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{env:BUILD_NUMBER}'
+assembly-informational-format: "{Major}.{Minor}.{Patch}.{CommitsSinceVersionSource:0000}"
 tag-prefix: '[vV]?'
 major-version-bump-message: \+semver:\s?(breaking|major)
 minor-version-bump-message: \+semver:\s?(feature|minor)
