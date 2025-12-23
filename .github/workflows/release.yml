@@ -44,7 +44,9 @@ jobs:
           configFilePath: gitversion.yml
 
       - run: |
-          echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
+          echo "FullSemVer (env.fullSemVer): ${{ env.fullSemVer }}"
+          echo "SemVer (env.SemVer): ${{ env.SemVer }}"
+          echo "AssemblySemVer (env.AssemblySemVer): ${{ env.AssemblySemVer }}"
         name: Display GitVersion variables (without prefix)
 
       - name: Ensure PowerShell modules (PSDepend, InvokeBuild, Pester, ModuleBuilder, PSScriptAnalyzer, InjectionHunter) are installed
