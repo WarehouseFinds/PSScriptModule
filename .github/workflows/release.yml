@@ -1,5 +1,5 @@
 name: Release
-run-name: '[${{ github.run_id }}][${{ github.ref_name }}] Release Job Id: ${{ github.run_id }}'
+run-name: '${{ RELEASE || github.ref_name }} - Run ID: ${{ github.run_id }} - by @${{ github.actor }}'
 
 on:
   workflow_dispatch:
