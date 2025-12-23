@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest] #[ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v4.2.0
+        with:
+          versionSpec: '6.4.x'
+          preferLatestVersion: true
+
+      - name: Determine Version
+        id: version_step # step id used as a reference for output values
+        uses: gittools/actions/gitversion/execute@v4.2.0
+        with:
+          configFilePath: VersionConfig.yml
+
+      - run: |
+          echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
+        name: Display GitVersion variables (without prefix)
+
+      - run: |
+          echo "GitVersion.FullSemVer = $(GitVersion.FullSemVer)"
+          echo "GitVersion.SemVer = $(GitVersion.SemVer)"
+        name: 'View Version'
+
+      - name: Ensure PowerShell modules (PSDepend, InvokeBuild, Pester, ModuleBuilder, PSScriptAnalyzer, InjectionHunter) are installed
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          Write-Host 'Installing required modules to CurrentUser scope if missing...'
+          $modules = 'PSDepend','InvokeBuild','Pester','ModuleBuilder','PSScriptAnalyzer','InjectionHunter'
+          foreach ($m in $modules) {
+            if (-not (Get-Module -ListAvailable -Name $m)) {
+              Install-Module -Name $m -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+            }
+          }
+
+      - name: Run build via Invoke-Build
+        shell: pwsh
+        run: |
+          $VerbosePreference = 'Continue'
+          Set-StrictMode -Version Latest
+          Import-Module InvokeBuild -ErrorAction Stop
+          # Run the repository build script using Invoke-Build; the script defines tasks
+          Write-Host (Get-Location)
+          Invoke-Build -Configuration Release
+
+      - name: Upload build artifacts (if any)
+        uses: actions/upload-artifact@v4
+        with:
+          name: PSRedFishClient-build
+          path: build/**
+          if-no-files-found: warn
