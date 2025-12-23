@@ -43,8 +43,6 @@ jobs:
         uses: gittools/actions/gitversion/execute@v4.2.0
         with:
           configFilePath: gitversion.yml
-          disableCache: true
-          disableNormalization: true
 
       - run: |
           echo "FullSemVer (env.fullSemVer): ${{ env.fullSemVer }}"

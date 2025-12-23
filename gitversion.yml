@@ -22,6 +22,7 @@ branches:
     is-main-branch: false
     pre-release-weight: 30000
   hotfix:
+    mode: ManualDeployment
     label: hotfix
     increment: Patch
     regex: ^hotfix(es)?[/-]|^patch?[/-]
