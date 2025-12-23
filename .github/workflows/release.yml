@@ -41,7 +41,7 @@ jobs:
         id: version_step # step id used as a reference for output values
         uses: gittools/actions/gitversion/execute@v4.2.0
         with:
-          configFilePath: VersionConfig.yml
+          configFilePath: gitversion.yml
 
       - run: |
           echo "FullSemVer (env.fullSemVer)            : ${{ env.fullSemVer }}"
