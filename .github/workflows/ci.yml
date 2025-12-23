@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest] #[ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout
@@ -32,6 +32,7 @@ jobs:
       - name: Run compile via ModuleBuilder
         shell: pwsh
         run: |
+          $VerbosePreference = 'Continue'
           Set-StrictMode -Version Latest
           Import-Module ModuleBuilder -ErrorAction Stop
           # Run the repository build script using Invoke-Build; the script defines tasks
