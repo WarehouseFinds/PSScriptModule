@@ -82,11 +82,14 @@ task Analyze {
 
 # Synopsis: Test the project with Pester tests
 task Test {
-    $TestFiles = Get-ChildItem -Path $script:testSourcePath -Recurse -Include "*.Tests.*"
+    $files = Get-ChildItem $moduleSourcePath -Dir -Force -Recurse |
+    Where-Object { $_.FullName -notLike '*build*' -and $_.FullName -notLike '*.git*' } |
+    Get-ChildItem -File -Force -Include '*.ps1' -Exclude '*.Tests.ps1' |
+    Select-Object -ExpandProperty FullName
     
     $Config = New-PesterConfiguration @{
         Run          = @{
-            Path = $TestFiles
+            Path = $script:testSourcePath
             Exit = $true
         }
         TestResult   = @{
@@ -96,7 +99,7 @@ task Test {
         }
         CodeCoverage = @{
             Enabled      = $true
-            Path         = $script:moduleSourcePath
+            Path         = $files
             OutputFormat = 'Cobertura'
             OutputPath   = "$coverageOutputPath\coverage.xml"
         }
