@@ -97,7 +97,12 @@ task Test {
         }
         CodeCoverage = @{
             Enabled        = $true
-            Path           = $script:moduleSourcePath
+            Path           = @(
+                "$script:moduleSourcePath\Classes",
+                "$script:moduleSourcePath\Enums",
+                "$script:moduleSourcePath\Public",
+                "$script:moduleSourcePath\Private"
+            )
             OutputFormat   = 'Cobertura'
             OutputPath     = "$coverageOutputPath\coverage.xml"
             OutputEncoding = 'UTF8'
