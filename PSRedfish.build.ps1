@@ -125,7 +125,7 @@ task UpdateModuleManifest GenerateNewModuleVersion, {
         Path          = $moduleManifestPath
         ModuleVersion = $moduleVersion
     }
-    [void] (Update-ModuleManifest @Params)
+    [void] (Update-PSModuleManifest @Params)
 }
 
 # Update the NuGet package specification with module version
