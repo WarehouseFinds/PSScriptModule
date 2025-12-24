@@ -40,6 +40,7 @@ Enter-Build {
     # Setting build script variables
     $script:moduleName = 'PSRedfishClient'
     $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath 'src'
+    $script:testSourcePath = Join-Path -Path $BuildRoot -ChildPath 'tests'
     $script:moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
     $script:nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
     $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
@@ -80,7 +81,7 @@ task Analyze {
 
 # Synopsis: Test the project with Pester tests
 task Test {
-    $TestFiles = Get-ChildItem -Path $moduleSourcePath -Recurse -Include "*.Tests.*"
+    $TestFiles = Get-ChildItem -Path $script:testSourcePath -Recurse -Include "*.Tests.*"
     
     $Config = New-PesterConfiguration @{
         Run        = @{
@@ -94,10 +95,6 @@ task Test {
 
     # Additional parameters on Azure Pipelines agents to generate test results
     if ($env:TF_BUILD) {
-        if (-not (Test-Path -Path $buildOutputPath -ErrorAction SilentlyContinue)) {
-            New-Item -Path $buildOutputPath -ItemType Directory
-        }
-
         $Timestamp = Get-date -UFormat "%Y%m%d-%H%M%S"
         $PSVersion = $PSVersionTable.PSVersion.Major
         $TestResultFile = "TestResults_PS$PSVersion`_$TimeStamp.xml"

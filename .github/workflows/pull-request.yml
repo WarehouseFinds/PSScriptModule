@@ -40,6 +40,15 @@ jobs:
           Write-Host (Get-Location)
           Invoke-Build -Configuration Debug
 
+      - name: Test code with Pester
+        shell: pwsh
+        run: |
+          $VerbosePreference = 'Continue'
+          Set-StrictMode -Version Latest
+          Import-Module InvokeBuild -ErrorAction Stop
+          Write-Host (Get-Location)
+          Invoke-Build -Task Test
+
       - name: Upload build artifacts (if any)
         uses: actions/upload-artifact@v4
         with:
