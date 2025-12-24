@@ -10,14 +10,19 @@
 
 Param (
     [Parameter(ValueFromPipelineByPropertyName = $true)]
-    [ValidateSet('Debug', 'Release')]
+    [ValidateSet('Debug', 'Release', 'Prerelease')]
     [String]
     $ReleaseType = 'Debug',
 
     [Parameter(ValueFromPipelineByPropertyName = $true)]
     [ValidateNotNullOrEmpty()]
     [String]
-    $SemanticVersion
+    $SemanticVersion,
+
+    [Parameter(ValueFromPipelineByPropertyName = $true)]
+    [ValidateNotNullOrEmpty()]
+    [String]
+    $NugetApiKey
 )
 
 Set-StrictMode -Version Latest
@@ -42,6 +47,7 @@ Enter-Build {
     $script:testSourcePath = Join-Path -Path $BuildRoot -ChildPath 'tests'
     $script:nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
     $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
+    $script:publishSourcePath = Join-Path -Path $buildOutputPath -ChildPath $moduleName
     $script:coverageOutputPath = Join-Path -Path $BuildRoot -ChildPath 'coverage'
 
     # Setting base module version and using it if building locally
@@ -111,35 +117,10 @@ task UnitTest {
     }
 }
 
-# Generate a new module version if creating a release build
-task GenerateNewModuleVersion {
-    # Using the current NuGet package version from the feed as a version base when building via Azure DevOps pipeline
-    $Script:moduleVersion = New-Object -TypeName 'System.Version' -ArgumentList ($SemanticVersion)
-}
-
-# Update the module manifest with module version
-task UpdateModuleManifest GenerateNewModuleVersion, {
-    Get-ChildItem -path $Script:moduleSourcePath
-    $Params = @{
-        Path          = $Script:moduleManifestPath
-        ModuleVersion = $Script:moduleVersion
-    }
-    [void] (Update-PSModuleManifest @Params)
-}
-
-# Update the NuGet package specification with module version
-task UpdatePackageSpecification GenerateNewModuleVersion, {
-    $xml = New-Object -TypeName 'XML'
-    $xml.Load($nuspecPath)
-    $metadata = Select-XML -Xml $xml -XPath '//package/metadata'
-    $metadata.Node.Version = $moduleVersion
-    [void] ($xml.Save($nuspecPath))
-}
-
 # Build the project
-task Build UpdateModuleManifest, UpdatePackageSpecification, {
+task Build Clean, {
     # Warning on local builds
-    if ($ReleaseType -eq 'Debug') {
+    if ($ReleaseType -ne 'Release') {
         Write-Warning "THIS IS A DEBUG BUILD. THE MODULE IS NOT SUITABLE FOR PRODUCTION USE."
     }
 
@@ -151,10 +132,28 @@ task Build UpdateModuleManifest, UpdatePackageSpecification, {
 
     # Copy-Item parameters
     Import-Module ModuleBuilder -ErrorAction Stop
-    Build-Module -Path $BuildRoot -OutputDirectory $buildOutputPath -ErrorAction Stop
+    $requestParam = @{
+        Path                       = $BuildRoot
+        OutputDirectory            = $buildOutputPath
+        SemVer                     = $SemanticVersion
+        UnversionedOutputDirectory = $true
+        ErrorAction                = 'Stop'
+    }
+    [void] (Build-Module @requestParam)
 }
 
-# Synopsis: Clean up the target build directory
+# Publish the module to PSGallery
+task Publish -If ($NugetApiKey) {
+    # 
+    $requestParam = @{
+        Path        = $publishSourcePath 
+        NuGetApiKey = $NugetApiKey
+        ErrorAction = 'Stop'
+    }
+    [void] (Publish-Module @requestParam)
+}
+
+# Clean up the target build directory
 task Clean {
     if (Test-Path $buildOutputPath) {
         Write-Warning "Removing build output folder at '$buildOutputPath'"
@@ -165,6 +164,4 @@ task Clean {
         }
         [void] (Remove-Item @requestParam)
     }
-
-    Write-Information "Build output folder cleaned up."
 }
