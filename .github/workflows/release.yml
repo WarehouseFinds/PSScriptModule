@@ -1,7 +1,6 @@
 name: Release
 run-name: '${{ github.run_id }} - Release Workflow - ${{ github.ref_name }}'
-permissions:
-  contents: read
+permissions: read-all
 on:
   workflow_dispatch:
     inputs:
@@ -25,6 +24,10 @@ on:
 jobs:
   build:
     name: Build and Test
+    permissions:
+      contents: write
+      actions: write
+      attestations: write
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
