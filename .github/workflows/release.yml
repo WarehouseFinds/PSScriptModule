@@ -79,3 +79,10 @@ jobs:
           name: PSRedFishClient-build
           path: build/**
           if-no-files-found: warn
+
+      # Create a new tag based on the commit SHA
+      - name: Create Tag
+        id: create_tag
+        run: |
+          git tag v${{ env.SemVer }}
+          git push origin v${{ github.ref_name }} --tags
