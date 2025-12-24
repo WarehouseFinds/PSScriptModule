@@ -121,6 +121,8 @@ task GenerateNewModuleVersion {
 
 # Update the module manifest with module version
 task UpdateModuleManifest GenerateNewModuleVersion, {
+    Get-ChildItem -Path $Script:moduleManifestPath
+    Get-ChildItem -path $Script:moduleSourcePath
     $Params = @{
         Path          = $Script:moduleManifestPath
         ModuleVersion = $Script:moduleVersion
