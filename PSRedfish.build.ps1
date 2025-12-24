@@ -44,7 +44,7 @@ Enter-Build {
     $script:testSourcePath = Join-Path -Path $BuildRoot -ChildPath 'tests'
     $script:nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
     $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
-    $script:coverageOutputPath = Join-Path -Path $buildOutputPath -ChildPath 'coverage'
+    $script:coverageOutputPath = Join-Path -Path $BuildRoot -ChildPath 'coverage'
 
     # Setting base module version and using it if building locally
     $script:newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList (0, 0, 1)
@@ -104,7 +104,7 @@ task Test {
     # Invoke all tests
     Invoke-Pester -Configuration $Config -Verbose
 
-    
+
 }
 
 # Synopsis: Generate a new module version if creating a release build
