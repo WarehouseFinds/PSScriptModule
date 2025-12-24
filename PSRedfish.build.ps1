@@ -93,13 +93,13 @@ task Test {
         TestResult   = @{
             Enabled      = $true
             OutputFormat = 'NUnitXml'
-            OutputPath   = $coverageOutputPath # Default: "testResults.xml"
+            OutputPath   = "$coverageOutputPath\testResults.xml"
         }
         CodeCoverage = @{
             Enabled        = $true
             Path           = $files
             OutputFormat   = 'Cobertura'
-            OutputPath     = $coverageOutputPath # Default: "coverage.xml"
+            OutputPath     = "$coverageOutputPath\coverage.xml"
             OutputEncoding = 'UTF8'
         }
     }
