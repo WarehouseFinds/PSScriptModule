@@ -14,7 +14,7 @@
         PSData = @{
             Tags         = @('Redfish', 'REST', 'Hardware')
             ProjectUri   = 'https://github.com/warehousefinds/PSRedfishClient'
-            LicenseUri   = 'https://github.com/warehousefinds/PSRedfishClient/LICENSE.md'
+            LicenseUri   = 'https://github.com/WarehouseFinds/PSRedFishClient/blob/main/LICENSE'
             ReleaseNotes = 'https://github.com/WarehouseFinds/PSRedFishClient/releases'
         }
     }

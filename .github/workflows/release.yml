@@ -82,6 +82,18 @@ jobs:
           path: build/**
           if-no-files-found: warn
 
+      - name: Publish build via Invoke-Build
+        # Change 'namerno' to the desired event name to enable publishing
+        if: github.event_name == 'namerno' 
+        shell: pwsh
+        env:
+          NuGetApiKey: ${{ secrets.NuGetApiKey_PSGallery }}
+        run: |
+          $VerbosePreference = 'Continue'
+          Set-StrictMode -Version Latest
+          Import-Module InvokeBuild -ErrorAction Stop
+          Invoke-Build -NugetApiKey ${{ env.NuGetApiKey }} -Task Publish
+
       # Create a new tag based on the version determined by GitVersion
       - name: Create Tag
         id: create_tag

@@ -60,16 +60,6 @@ jobs:
           Import-Module InvokeBuild -ErrorAction Stop
           Invoke-Build -ReleaseType Release -SemanticVersion ${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}
 
-      - name: Publish build via Invoke-Build
-        shell: pwsh
-        env:
-          NuGetApiKey: ${{ secrets.NuGetApiKey_PSGallery }}
-        run: |
-          $VerbosePreference = 'Continue'
-          Set-StrictMode -Version Latest
-          Import-Module InvokeBuild -ErrorAction Stop
-          Invoke-Build -NugetApiKey ${{ env.NuGetApiKey }} -Task Publish
-
       - name: Run Unit Tests via Invoke-Build
         shell: pwsh
         run: |
