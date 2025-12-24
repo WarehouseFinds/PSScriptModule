@@ -3,7 +3,7 @@ Describe 'PSRedFishClient basic' {
         Test-Path -Path (Resolve-Path "src/PSRedFishClient.psd1") | Should -BeTrue
     }
 
-    <#     Context 'Functions exported' {
+    <#    Context 'Functions exported' {
         BeforeAll { Import-Module (Resolve-Path "../src/PSRedFishClient") -Force }
 
         It 'Connect-Redfish is available' {

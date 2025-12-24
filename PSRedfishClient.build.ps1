@@ -122,8 +122,8 @@ task GenerateNewModuleVersion {
 # Update the module manifest with module version
 task UpdateModuleManifest GenerateNewModuleVersion, {
     $Params = @{
-        Path          = $moduleManifestPath
-        ModuleVersion = $moduleVersion
+        Path          = $Script:moduleManifestPath
+        ModuleVersion = $Script:moduleVersion
     }
     [void] (Update-PSModuleManifest @Params)
 }
