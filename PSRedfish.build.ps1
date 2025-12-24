@@ -82,8 +82,7 @@ task Analyze {
 
 # Synopsis: Test the project with Pester tests
 task Test {
-    $files = Get-ChildItem -Path $moduleSourcePath -Recurse -Force -Include '*.ps1' -Exclude '*.Tests.ps1', '*build.ps1' |
-    Select-Object -ExpandProperty FullName
+    $files = Get-ChildItem -Path $moduleSourcePath -Recurse -Force -Include '*.ps1' -Exclude '*.Tests.ps1', '*build.ps1'
     
     $Config = New-PesterConfiguration @{
         Run          = @{
@@ -94,13 +93,13 @@ task Test {
         TestResult   = @{
             Enabled      = $true
             OutputFormat = 'NUnitXml'
-            OutputPath   = "$coverageOutputPath\testResults.xml"
+            OutputPath   = $coverageOutputPath # Default: "testResults.xml"
         }
         CodeCoverage = @{
             Enabled        = $true
             Path           = $files
             OutputFormat   = 'Cobertura'
-            OutputPath     = "$coverageOutputPath\coverage.xml"
+            OutputPath     = $coverageOutputPath # Default: "coverage.xml"
             OutputEncoding = 'UTF8'
         }
     }
