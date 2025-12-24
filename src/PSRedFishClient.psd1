@@ -5,7 +5,7 @@
     CompanyName       = 'Warehouse Finds'
     Copyright         = '(c) Warehouse Finds'
     Description       = 'A sample PowerShell script module.'
-    RootModule        = 'PSRedfishClient.psm1'
+    #RootModule        = 'PSRedfishClient.psm1'
     FunctionsToExport = @()
     PrivateData       = @{
         PSData = @{
