@@ -8,15 +8,13 @@
     This script contains the tasks for building the 'SampleModule' PowerShell module
 #>
 
-[CmdletBinding(DefaultParameterSetName = 'Debug')]
 Param (
-    [Parameter(ParameterSetName = 'Debug', ValueFromPipelineByPropertyName = $true)]
-    [Parameter(ParameterSetName = 'Release', ValueFromPipelineByPropertyName = $true)]
+    [Parameter(ValueFromPipelineByPropertyName = $true)]
     [ValidateSet('Debug', 'Release')]
     [String]
     $ReleaseType = 'Debug',
 
-    [Parameter(ParameterSetName = 'Release', ValueFromPipelineByPropertyName = $true)]
+    [Parameter(ValueFromPipelineByPropertyName = $true)]
     [ValidateNotNullOrEmpty()]
     [String]
     $SemanticVersion
