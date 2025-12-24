@@ -33,12 +33,8 @@ task . Clean, Build
 
 # Install build dependencies
 Enter-Build {
-
-    # Installing PSDepend for dependency management
-    Import-Module PSDepend
-
     # Installing dependencies
-    Invoke-PSDepend -Force
+    Invoke-PSDepend -Force -Path "./requirements.psd1"
 
     # Setting build script variables
     $script:moduleName = 'PSRedfishClient'
