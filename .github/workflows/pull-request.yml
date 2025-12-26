@@ -33,14 +33,19 @@ jobs:
         run: |
           $VerbosePreference = 'Continue'
           Set-StrictMode -Version Latest
-          Import-Module InvokeBuild -ErrorAction Stop
           Invoke-Build -ReleaseType Debug
+
+      - name: Run Static Code Analysis via Invoke-Build
+        shell: pwsh
+        run: |
+          $VerbosePreference = 'Continue'
+          Set-StrictMode -Version Latest
+          Invoke-Build -Task Analyze
 
       - name: Run Unit Tests via Invoke-Build
         shell: pwsh
         run: |
           Set-StrictMode -Version Latest
-          Import-Module InvokeBuild -ErrorAction Stop
           Invoke-Build -Task UnitTest
 
       - name: Upload Code Coverage Report
