@@ -53,9 +53,7 @@ jobs:
         if: (!cancelled())
         with:
           files: |
-            test-results/**/*.xml
-            test-results/**/*.trx
-            test-results/**/*.json
+            PSSA.xml
 
       - name: Upload Code Coverage Report
         uses: actions/upload-artifact@v4
