@@ -45,7 +45,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: (!cancelled())
         with:
-          check_name: Static Code Analysis
+          check_name: "Report: Static Code Analysis"
           comment_mode: off
           files: |
             test-results/**/*.xml
