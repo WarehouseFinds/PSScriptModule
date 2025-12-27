@@ -5,12 +5,12 @@ BeforeAll {
 
 Describe "Get-PSScriptModuleInfo Tests" {
     It "Should return module info for existing module" {
-        $moduleInfo = Get-PSScriptModuleInfo -ModuleName "PSReadLine"
+        $moduleInfo = Get-PSScriptModuleInfo -ModulePath (Join-Path -Path $PSScriptRoot -ChildPath "../PSScriptModule.psd1")
         $moduleInfo | Should -Not -Be $null
-        $moduleInfo.Name | Should -Be "PSReadLine"
+        $moduleInfo.Name | Should -Be "PSScriptModule"
     }
 
     It "Should throw an error for non-existing module" {
-        { Get-PSScriptModuleInfo -ModuleName "NonExistingModule" } | Should -Throw
+        { Get-PSScriptModuleInfo -ModulePath "NonExistingModule" } | Should -Throw
     }
 }

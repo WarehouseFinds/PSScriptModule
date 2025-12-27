@@ -5,7 +5,7 @@ BeforeAll {
 
 Describe "GetModuleId Tests" {
     It "Should return module ID for existing module" {
-        $moduleId = GetModuleId -ModulePath "../PSScriptModule.psd1"
+        $moduleId = GetModuleId -ModulePath (Join-Path -Path $PSScriptRoot -ChildPath "../PSScriptModule.psd1")
         $moduleId | Should -Not -Be $null
         $moduleId | Should -BeOfType [string]
     }
