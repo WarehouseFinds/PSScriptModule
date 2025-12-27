@@ -6,8 +6,7 @@ function Get-PSScriptModuleInfo {
     )
 
     # Import the module manifest
-    $moduleManifest = Import-PowerShellDataFile -Path (Join-Path -Path $ModulePath -ChildPath "$((Get-Item $ModulePath).BaseName).psd1")
-
+    $moduleManifest = Import-PowerShellDataFile -Path $ModulePath 
     # Create a custom object to hold module information
     $moduleInfo = [PSCustomObject]@{
         Name         = $moduleManifest.ModuleName
