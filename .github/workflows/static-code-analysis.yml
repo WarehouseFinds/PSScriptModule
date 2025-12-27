@@ -39,10 +39,11 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: (!cancelled())
         with:
-          check_run: false
-          check_name: "PSScriptAnalyzer Report"
+          check_run: true
+          check_name: PSScriptAnalyzer Report
+          check_run_annotations	: all tests, skipped tests
           job_summary: true
-          comment_title: "PSScriptAnalyzer Report"
-          comment_mode: failures
+          comment_title: PSScriptAnalyzer Report
+          comment_mode: changes in failures
           files: |
             test-results/**/PSSA.xml
