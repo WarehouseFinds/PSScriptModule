@@ -93,7 +93,7 @@ task UnitTest {
         }
         TestResult   = @{
             Enabled      = $true
-            OutputFormat = 'NUnitXml'
+            OutputFormat = 'JUnitXml'
             OutputPath   = "$unitTestOutputPath\testResults.xml"
         }
         CodeCoverage = @{
