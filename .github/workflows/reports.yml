@@ -10,3 +10,7 @@ jobs:
   reports:
     name: Generate Reports Placeholder
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Placeholder Step
+        run: echo "This is a placeholder for report generation steps."
