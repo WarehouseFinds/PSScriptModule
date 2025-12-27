@@ -1,4 +1,4 @@
-name: Release
+name: CI Release
 run-name: '${{ github.run_id }} - Release Workflow - ${{ github.ref_name }}'
 permissions: read-all
 on:
@@ -59,7 +59,6 @@ jobs:
         shell: pwsh
         run: |
           Set-StrictMode -Version Latest
-          Write-Host 'Installing required modules to CurrentUser scope if missing...'
           $modules = 'PSDepend','InvokeBuild','Pester','ModuleBuilder','PSScriptAnalyzer','InjectionHunter'
           foreach ($m in $modules) {
             if (-not (Get-Module -ListAvailable -Name $m)) {

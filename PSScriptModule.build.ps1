@@ -25,6 +25,7 @@ Param (
     $NugetApiKey
 )
 
+# Enforce strict mode for better scripting practices
 Set-StrictMode -Version Latest
 
 # Synopsis: Default task
@@ -33,48 +34,48 @@ task . Clean, Build
 
 # Install build dependencies
 Enter-Build {
-    # Installing dependencies
-    Invoke-PSDepend -Force -Path "./requirements.psd1"
-
     # Setting build script variables
-    $script:moduleName = 'PSRedfishClient'
+    $script:moduleName = 'PSScriptModule'
     $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath 'src'
     $script:moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
     $script:testSourcePath = Join-Path -Path $BuildRoot -ChildPath 'tests'
+    $script:testOutputPath = Join-Path -Path $BuildRoot -ChildPath 'test-results'
     $script:nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
     $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
     $script:publishSourcePath = Join-Path -Path $buildOutputPath -ChildPath $moduleName
     $script:coverageOutputPath = Join-Path -Path $BuildRoot -ChildPath 'coverage'
+    $script:psScriptAnalyzerSourcePath = Join-Path -Path $BuildRoot -ChildPath './tests/SCA/PSScriptAnalyzer.Tests.ps1'
+    $script:psScriptAnalyzerOutputPath = Join-Path -Path $testOutputPath -ChildPath 'SCA'
+    $script:unitTestSourcePath = Join-Path -Path $BuildRoot -ChildPath './tests/Unit'
+    $script:unitTestOutputPath = Join-Path -Path $testOutputPath -ChildPath 'Unit'
+
 
     # Setting base module version and using it if building locally
     $script:newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList (0, 0, 1)
 }
 
 # Synopsis: Analyze the project with PSScriptAnalyzer
-task Analyze {
-    # Get-ChildItem parameters
-    $TestFiles = Get-ChildItem -Path $moduleSourcePath -Recurse -Include "*.PSSATests.*"
-    
+task Analyze { 
+    # Create build output folder
+    if (-not (Test-Path $psScriptAnalyzerOutputPath)) {
+        Write-Warning "Creating build output folder at '$psScriptAnalyzerOutputPath'"
+        [void] (New-Item -Path $psScriptAnalyzerOutputPath -ItemType Directory)
+    }
     $Config = New-PesterConfiguration @{
         Run        = @{
-            Path = $TestFiles
+            Path = $script:psScriptAnalyzerSourcePath
             Exit = $true
         }
         TestResult = @{
-            Enabled = $true
+            Enabled      = $true
+            OutputFormat = 'NUnitXml'
+            OutputPath   = "$psScriptAnalyzerOutputPath\PSSA.xml"
         }
     }
 
-    # Additional parameters on Azure Pipelines agents to generate test results
-    if ($env:TF_BUILD) {
-        if (-not (Test-Path -Path $buildOutputPath -ErrorAction SilentlyContinue)) {
-            New-Item -Path $buildOutputPath -ItemType Directory
-        }
-        $Timestamp = Get-date -UFormat "%Y%m%d-%H%M%S"
-        $PSVersion = $PSVersionTable.PSVersion.Major
-        $TestResultFile = "AnalysisResults_PS$PSVersion`_$TimeStamp.xml"
-        $Config.TestResult.OutputPath = "$buildOutputPath\$TestResultFile"
-    }
+    #$Timestamp = Get-date -UFormat "%Y%m%d-%H%M%S"
+    #$PSVersion = $PSVersionTable.PSVersion.Major
+    #$TestResultFile = "AnalysisResults_PS$PSVersion`_$TimeStamp.xml"
 
     # Invoke all tests
     Invoke-Pester -Configuration $Config
@@ -83,17 +84,17 @@ task Analyze {
 # Synopsis: Run Pester tests Unit tests and generate code coverage report
 task UnitTest {
     #$files = Get-ChildItem -Path $moduleSourcePath -Recurse -Force -Include '*.ps1' -Exclude '*.Tests.ps1', '*build.ps1'
-    
-    $Config = New-PesterConfiguration @{
+    $unitContainer = New-PesterContainer -Path $Script:moduleSourcePath -Data @{ SourcePath = $script:moduleSourcePath }
+    $unitConfig = New-PesterConfiguration @{
         Run          = @{
-            Path     = $Script:testSourcePath
-            PassThru = $true
-            Exit     = $true
+            Container = $unitContainer
+            PassThru  = $true
+            Exit      = $true
         }
         TestResult   = @{
             Enabled      = $true
             OutputFormat = 'NUnitXml'
-            OutputPath   = "$coverageOutputPath\testResults.xml"
+            OutputPath   = "$unitTestOutputPath\testResults.xml"
         }
         CodeCoverage = @{
             Enabled        = $true
@@ -103,14 +104,8 @@ task UnitTest {
             OutputEncoding = 'UTF8'
         }
     }
-
     # Invoke all tests
-    $result = Invoke-Pester -Configuration $Config -Verbose
-
-    # Fail the task if the code coverage results are not acceptable
-    if ( $result.CodeCoverage.CoveragePercent -lt $result.CodeCoverage.CoveragePercentTarget) {
-        Write-Warning "The overall code coverage by Pester tests is $("0:0.##" -f $result.CodeCoverage.CoveragePercent)% which is less than quality gate of $($result.CodeCoverage.CoveragePercentTarget)%. Pester ModuleVersion is: $((Get-Module -Name Pester -ListAvailable).Version)."
-    }
+    Invoke-Pester -Configuration $unitConfig -Verbose
 }
 
 # Build the project
