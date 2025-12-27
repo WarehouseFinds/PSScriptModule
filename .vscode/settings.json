@@ -1,18 +1,32 @@
 {
+    // Editor settings
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.tabSize": 4,
+    "editor.renderWhitespace": "all",
+
+
     // Enable PowerShell Script Analyzer in workspace
     "powershell.scriptAnalysis.enable": true,
-    "powershell.scriptAnalysis.settingsPath": ".PSScriptAnalyzerSettings.psd1",
+    "powershell.scriptAnalysis.settingsPath": ".vscode/PSScriptAnalyzerSettings.psd1",
 
     // Use PowerShell extension as default formatter for PowerShell files
     "editor.defaultFormatter": "ms-vscode.powershell",
 
     // Basic editor/workspace conveniences
     "files.exclude": {
-        "**/artifacts": true,
         "**/.DS_Store": true
     },
 
     // Placeholder settings for InjectionHunter extension — set by user to match chosen extension
     "injectionHunter.enable": true,
-    "injectionHunter.scanOnSave": true
+    "injectionHunter.scanOnSave": true,
+
+    // PowerShell extension settings
+    "powershell.pester.useLegacyCodeLens": false,
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.preset": "Allman",
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.codeFormatting.useCorrectCasing": true
 }
