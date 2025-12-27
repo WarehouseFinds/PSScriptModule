@@ -40,10 +40,12 @@ jobs:
         if: (!cancelled())
         with:
           check_run: false
-          check_name: "Unit Test Results"
+          check_name: Unit Test Results
+          check_run_annotations	: all tests, skipped tests
           job_summary: true
-          comment_title: "Unit Test Results"
+          comment_title: Unit Test Results
           comment_mode: failures
+          fail_on: test failures
           files: |
             test-results/**/testResults.xml
 
