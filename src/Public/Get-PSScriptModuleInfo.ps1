@@ -1,4 +1,5 @@
-function Get-PSScriptModuleInfo {
+function Get-PSScriptModuleInfo
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
@@ -6,7 +7,7 @@ function Get-PSScriptModuleInfo {
     )
 
     # Import the module manifest
-    $moduleManifest = Import-PowerShellDataFile -Path $ModulePath 
+    $moduleManifest = Import-PowerShellDataFile -Path $ModulePath
     # Create a custom object to hold module information
     $moduleInfo = [PSCustomObject]@{
         ModuleVersion = $moduleManifest.ModuleVersion
