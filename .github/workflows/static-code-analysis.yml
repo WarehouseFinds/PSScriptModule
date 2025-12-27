@@ -1,6 +1,8 @@
 name: CI - Static Code Analysis
 
 on:
+  push:
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
@@ -34,11 +36,11 @@ jobs:
           Set-StrictMode -Version Latest
           Invoke-Build -Task Analyze
 
-      - name: Publish Test Results
+      - name: Publish Static Code Analysis Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: (!cancelled())
         with:
-          check_name: "Static Code Analysis Report"
+          check_name: "Report: Static Code Analysis"
           comment_mode: off
           files: |
             test-results/**/PSSA.xml

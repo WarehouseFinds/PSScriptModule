@@ -1,6 +1,8 @@
 name: CI - Code Quality Analysis
 
 on:
+  push:
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
@@ -33,11 +35,11 @@ jobs:
           Set-StrictMode -Version Latest
           Invoke-Build -Task UnitTest
 
-      - name: Publish Test Results
+      - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: (!cancelled())
         with:
-          check_name: "Unit Tests Report"
+          check_name: "Report: Unit Tests"
           comment_mode: off
           files: |
             test-results/**/testResults.xml
