@@ -39,8 +39,8 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: (!cancelled())
         with:
-          check_run: false
-          check_name: Unit Test Results
+          check_run: true
+          #check_name: Unit Test Results
           check_run_annotations	: all tests, skipped tests
           job_summary: true
           comment_title: Unit Test Results
