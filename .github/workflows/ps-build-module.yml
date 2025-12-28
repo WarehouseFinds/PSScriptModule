@@ -1,4 +1,4 @@
-name: Build Project
+name: Build PowerShell Module
 
 on:
   workflow_call:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: Build PowerShell Module
+    name: PowerShell Module
     runs-on: [ubuntu-latest]
     permissions:
       contents: write

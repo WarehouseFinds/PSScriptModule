@@ -1,15 +1,15 @@
-name: Setup project dependencies
+name: Setup powershell dependencies
 permissions: read-all
 on:
   workflow_call:
     outputs:
       module-list: 
         description: 'Comma-separated list of PowerShell modules to install and cache'
-        value: ${{ jobs.setup-dependencies.outputs.module-list }}
+        value: ${{ jobs.setup-powershell-dependencies.outputs.module-list }}
 
 jobs:
-  setup-dependencies:
-    name: Dependencies
+  setup-powershell-dependencies:
+    name: Powershell Dependencies
     runs-on: [ubuntu-latest]
     outputs:
       module-list: ${{ steps.resolve-dependencies.outputs.module-list }}

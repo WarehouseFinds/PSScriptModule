@@ -30,12 +30,12 @@ on:
 jobs:
   setup:
     name: Setup
-    uses: ./.github/workflows/run-setup.yml
+    uses: ./.github/workflows/ps-cache-dependencies.yml
 
   unit-tests:
     name: Unit Tests
     needs: [setup]
-    uses: ./.github/workflows/run-codequality-unit-tests.yml
+    uses: ./.github/workflows/ps-unit-tests.yml
     permissions:
       issues: write
       pull-requests: write
@@ -46,7 +46,7 @@ jobs:
   static-code-analysis:
     name: Static Code Analysis
     needs: [setup]
-    uses: ./.github/workflows/run-codequality-static-code-analysis.yml
+    uses: ./.github/workflows/ps-static-code-analysis.yml
     permissions:
       issues: write
       pull-requests: write
@@ -57,7 +57,7 @@ jobs:
   semantic-code-analysis:
     name: Semantic Code Analysis
     needs: [setup]
-    uses: ./.github/workflows/run-codequality-semantic-code-analysis.yml
+    uses: ./.github/workflows/ps-semantic-code-analysis.yml
     permissions:
       security-events: write
       actions: read
@@ -67,7 +67,7 @@ jobs:
   build:
     name: Build
     needs: [setup, unit-tests, static-code-analysis, semantic-code-analysis]
-    uses: ./.github/workflows/run-build.yml
+    uses: ./.github/workflows/ps-build-module.yml
     permissions:
       contents: write
     with:
