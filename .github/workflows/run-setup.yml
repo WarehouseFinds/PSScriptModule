@@ -37,6 +37,8 @@ jobs:
         id: resolve-dependencies
         shell: pwsh
         run: |
+          # Resolve module dependencies from requirements.psd1
+          $moduleRequirements = Import-PowerShellDataFile -Path './requirements.psd1'
           $packages = @($moduleRequirements.Packages)
           $moduleList = (
               $packages |
