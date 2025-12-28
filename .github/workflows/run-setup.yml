@@ -49,10 +49,10 @@ jobs:
                       }
 
                       if ($_.Version -ne 'latest') {
-                          "$name:$($_.Version)"
+                          "$($name):$($_.Version)"
                       }
                       else {
-                          "$name::"
+                          "$($name)::"
                       }
                   }
           ) -join ','
