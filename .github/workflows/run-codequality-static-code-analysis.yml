@@ -39,10 +39,10 @@ jobs:
         if: (!cancelled())
         with:
           check_run: true
-          check_name: PSScriptAnalyzer Report
+          check_name: Reports / PSScriptAnalyzer Report
           check_run_annotations	: all tests, skipped tests
           job_summary: true
-          comment_title: Reports / PSScriptAnalyzer Report
+          comment_title: PSScriptAnalyzer Report
           comment_mode: off
           files: |
             test-results/**/PSSA.xml
