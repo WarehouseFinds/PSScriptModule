@@ -1,9 +1,6 @@
 name: CI
 run-name: CI • ${{ github.event_name }} • ${{ github.ref_name }}
-permissions:
-  issues: write
-  pull-requests: write
-  checks: write
+permissions: read-all
 
 on:
   workflow_dispatch:
@@ -38,5 +35,9 @@ jobs:
     name: Unit Tests
     needs: [setup]
     uses: ./.github/workflows/run-codequality-unit-tests.yml
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
     with:
       module-list: ${{ needs.setup.outputs.module-list }}
