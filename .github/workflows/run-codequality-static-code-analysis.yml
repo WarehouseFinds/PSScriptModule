@@ -42,7 +42,7 @@ jobs:
           check_name: PSScriptAnalyzer Report
           check_run_annotations	: all tests, skipped tests
           job_summary: true
-          comment_title: PSScriptAnalyzer Report
+          comment_title: Reports / PSScriptAnalyzer Report
           comment_mode: off
           files: |
             test-results/**/PSSA.xml

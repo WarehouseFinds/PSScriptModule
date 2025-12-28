@@ -39,10 +39,10 @@ jobs:
         if: (!cancelled())
         with:
           check_run: true
-          check_name: Unit Test Report
+          check_name: Reports / Unit Test Report
           check_run_annotations	: all tests, skipped tests
           job_summary: true
-          comment_title: Unit Test Results
+          comment_title:  Unit Test Report
           comment_mode: off
           fail_on: test failures
           files: |
