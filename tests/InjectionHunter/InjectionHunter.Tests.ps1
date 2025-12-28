@@ -8,16 +8,16 @@ Set-StrictMode -Version Latest
 Describe 'Injection Hunter security checks' {
 
     BeforeAll {
-        $modulePath = Resolve-Path (Join-Path $PSScriptRoot '..\..\src')
         $injectionHunterPath = (Get-Module InjectionHunter -ListAvailable).Path
     }
     BeforeDiscovery {
+        $modulePath = Resolve-Path (Join-Path $PSScriptRoot '..\..\src')
         $files = Get-ChildItem -Path $modulePath Inlcude '*.ps*1' -Exclude '*.Tests.*'
     }
 
     It '<_.BaseName> contains no Injection Hunter violations' -ForEach $files {
         $requestParam = @{
-            Path           = $modulePath
+            Path           = $_
             Recurse        = $true
             CustomRulePath = $injectionHunterPath
             Severity       = 'Warning', 'Error'
