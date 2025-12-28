@@ -54,7 +54,7 @@ jobs:
                           "$($name):$($_.Version)"
                       }
                       else {
-                          "$($name)::"
+                          "$($name)"
                       }
                   }
           ) -join ','
