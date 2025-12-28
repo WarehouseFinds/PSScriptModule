@@ -31,6 +31,7 @@ jobs:
       - name: Run Code Injection Analysis via Invoke-Build
         shell: pwsh
         run: |
+          $VerbosePreference = 'Continue'
           Set-StrictMode -Version Latest
           Invoke-Build -Task InjectionHunter
 

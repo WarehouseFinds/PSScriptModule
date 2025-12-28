@@ -6,20 +6,11 @@ param(
 )
 
 BeforeDiscovery {
-    # For use within the tests, during the Run phase
     $modulePath = Resolve-Path (Join-Path $PSScriptRoot '..\..\src')
-
-    # Dynamically defining the functions to analyze
-    $functionPaths = @()
-    if (Test-Path -Path "$modulePath\Private\*.ps1") {
-        $functionPaths += Get-ChildItem -Path "$modulePath\Private\*.ps1" -Exclude '*.Tests.*'
-    }
-    if (Test-Path -Path "$modulePath\Public\*.ps1") {
-        $functionPaths += Get-ChildItem -Path "$modulePath\Public\*.ps1" -Exclude '*.Tests.*'
-    }
+    $files = Get-ChildItem -Path $modulePath -Recurse -Include '*.ps*1' -Exclude '*.Tests.*'
 }
 
-Describe "'<_>' Function Analysis with PSScriptAnalyzer" -ForEach $functionPaths {
+Describe "'<_>' Function Analysis with PSScriptAnalyzer" -ForEach $files {
     BeforeAll {
         $functionName = $_.BaseName
         $functionPath = $_

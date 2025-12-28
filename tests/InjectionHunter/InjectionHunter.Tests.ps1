@@ -14,12 +14,11 @@ Describe 'Injection Hunter security checks' {
         $files = Get-ChildItem -Path $modulePath -Recurse -Include '*.ps*1' -Exclude '*.Tests.*'
     }
 
-    It '<_.BaseName> contains no Injection Hunter violations' -ForEach $files {
+    It '<_.BaseName> Function should contains no Injection Hunter violations' -ForEach $files {
         $requestParam = @{
             Path           = $_
             Recurse        = $true
             CustomRulePath = $injectionHunterPath
-            Severity       = 'Warning', 'Error'
         }
         $results = Invoke-ScriptAnalyzer @requestParam | ForEach-Object {
             "Problem in $($_.ScriptName) at line $($_.Line) with message: $($_.Message)"
