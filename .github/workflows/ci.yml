@@ -54,6 +54,17 @@ jobs:
     with:
       module-list: ${{ needs.setup.outputs.module-list }}
 
+  code-injection:
+    name: Code Injection
+    needs: [setup]
+    uses: ./.github/workflows/ps-code-injection.yml
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+    with:
+      module-list: ${{ needs.setup.outputs.module-list }}
+
   semantic-code-analysis:
     name: Semantic Code Analysis
     needs: [setup]
@@ -67,7 +78,7 @@ jobs:
   
   build:
     name: Build
-    needs: [setup, unit-tests, static-code-analysis, semantic-code-analysis]
+    needs: [setup, unit-tests, static-code-analysis]
     uses: ./.github/workflows/ps-build-module.yml
     permissions:
       contents: write

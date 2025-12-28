@@ -45,7 +45,7 @@ Enter-Build {
 }
 
 # Synopsis: Analyze the project with PSScriptAnalyzer
-task Analyze {
+task PSScriptAnalyzer {
     # Create test output folder
     if (-not (Test-Path $testOutputPath)) {
         [void] (New-Item -Path $testOutputPath -ItemType Directory)
@@ -59,6 +59,28 @@ task Analyze {
             Enabled      = $true
             OutputFormat = 'NUnitXml'
             OutputPath   = "$testOutputPath\static-code-analysis.xml"
+        }
+    }
+
+    # Invoke all tests
+    Invoke-Pester -Configuration $Config
+}
+
+# Synopsis: Scan the project with Injection Hunter
+task InjectionHunter {
+    # Create test output folder
+    if (-not (Test-Path $testOutputPath)) {
+        [void] (New-Item -Path $testOutputPath -ItemType Directory)
+    }
+    $Config = New-PesterConfiguration @{
+        Run        = @{
+            Path = (Join-Path -Path $testSourcePath -ChildPath 'InjectionHunter')
+            Exit = $true
+        }
+        TestResult = @{
+            Enabled      = $true
+            OutputFormat = 'NUnitXml'
+            OutputPath   = "$testOutputPath\code-injection.xml"
         }
     }
 

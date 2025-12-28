@@ -29,7 +29,7 @@
             Name       = 'InjectionHunter'
             Repository = 'PSGallery'
             Type       = 'Release'
-            Version    = 'latest'
+            Version    = '1.0.0'
         }
         @{
             Name       = 'platyPS'
