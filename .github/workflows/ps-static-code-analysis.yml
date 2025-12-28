@@ -1,0 +1,48 @@
+name: CI Static Code Analysis
+run-name: CI Static Code Analysis • ${{ github.event_name }} • ${{ github.ref_name }}
+
+on:
+  workflow_call:
+    inputs:
+      module-list:
+        description: 'Comma-separated list of PowerShell modules to install and cache'
+        required: true
+        type: string
+
+jobs:
+  static-code-analysis:
+    name: PSScriptAnalyzer
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install and cache PowerShell modules
+        uses: potatoqualitee/psmodulecache@v6.2.1
+        with:
+          modules-to-cache: ${{ inputs['module-list'] }}  
+          shell: pwsh
+          updatable: false
+
+      - name: Run Static Code Analysis via Invoke-Build
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          Invoke-Build -Task PSScriptAnalyzer
+
+      - name: Publish Static Code Analysis Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: (!cancelled())
+        with:
+          check_run: false
+          check_name: ">> Report: PSScriptAnalyzer"
+          check_run_annotations	: all tests, skipped tests
+          job_summary: true
+          comment_title: PSScriptAnalyzer Report
+          comment_mode: off
+          files: |
+            test-results/static-code-analysis.xml

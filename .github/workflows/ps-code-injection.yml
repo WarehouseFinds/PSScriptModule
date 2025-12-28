@@ -1,0 +1,48 @@
+name: CI Code Injection
+run-name: CI Code Injection • ${{ github.event_name }} • ${{ github.ref_name }}
+
+on:
+  workflow_call:
+    inputs:
+      module-list:
+        description: 'Comma-separated list of PowerShell modules to install and cache'
+        required: true
+        type: string
+
+jobs:
+  code-injection:
+    name: InjectionHunter
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install and cache PowerShell modules
+        uses: potatoqualitee/psmodulecache@v6.2.1
+        with:
+          modules-to-cache: ${{ inputs['module-list'] }}  
+          shell: pwsh
+          updatable: false
+
+      - name: Run Code Injection Analysis via Invoke-Build
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          Invoke-Build -Task InjectionHunter
+
+      - name: Publish Code Injection Analysis Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: (!cancelled())
+        with:
+          check_run: false
+          check_name: ">> Report: InjectionHunter"
+          check_run_annotations	: all tests, skipped tests
+          job_summary: true
+          comment_title: InjectionHunter Report
+          comment_mode: off
+          files: |
+            test-results/code-injection.xml

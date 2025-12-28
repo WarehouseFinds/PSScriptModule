@@ -1,0 +1,86 @@
+name: CI
+run-name: CI • ${{ github.event_name }} • ${{ github.ref_name }}
+permissions: read-all
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
+      - 'hotfix/**'
+
+jobs:
+  setup:
+    name: Setup
+    uses: ./.github/workflows/ps-cache-dependencies.yml
+
+  unit-tests:
+    name: Unit Tests
+    needs: [setup]
+    uses: ./.github/workflows/ps-unit-tests.yml
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+    with:
+      module-list: ${{ needs.setup.outputs.module-list }}
+
+  static-code-analysis:
+    name: Static Code Analysis
+    needs: [setup]
+    uses: ./.github/workflows/ps-static-code-analysis.yml
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+    with:
+      module-list: ${{ needs.setup.outputs.module-list }}
+
+  code-injection:
+    name: Code Injection
+    needs: [setup]
+    uses: ./.github/workflows/ps-code-injection.yml
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+    with:
+      module-list: ${{ needs.setup.outputs.module-list }}
+
+  semantic-code-analysis:
+    name: Semantic Code Analysis
+    needs: [setup]
+    uses: ./.github/workflows/ps-semantic-code-analysis.yml
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: read
+  
+  build:
+    name: Build
+    needs: [setup, unit-tests, static-code-analysis]
+    uses: ./.github/workflows/ps-build-module.yml
+    permissions:
+      contents: write
+    with:
+      module-list: ${{ needs.setup.outputs.module-list }}
