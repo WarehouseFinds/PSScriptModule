@@ -15,7 +15,7 @@ jobs:
       issues: write
       pull-requests: write
       checks: write
-    name: Unit Tests
+    name: Pester Unit Tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

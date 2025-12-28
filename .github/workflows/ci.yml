@@ -41,3 +41,14 @@ jobs:
       checks: write
     with:
       module-list: ${{ needs.setup.outputs.module-list }}
+
+  static-code-analysis:
+    name: Static Code Analysis
+    needs: [setup]
+    uses: ./.github/workflows/run-codequality-static-code-analysis.yml
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
+    with:
+      module-list: ${{ needs.setup.outputs.module-list }}
