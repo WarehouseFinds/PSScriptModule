@@ -5,13 +5,13 @@
             Name       = 'InvokeBuild'
             Repository = 'PSGallery'
             Type       = 'Release'
-            Version    = 'latest'
+            Version    = '5.14.22'
         }
         @{
             Name       = 'ModuleBuilder'
             Repository = 'PSGallery'
             Type       = 'Release'
-            Version    = 'latest'
+            Version    = '3.1.8'
         }
         @{
             Name       = 'Pester'
@@ -32,10 +32,10 @@
             Version    = 'latest'
         }
         @{
-            Name       = 'PlatyPS'
+            Name       = 'platyPS'
             Repository = 'PSGallery'
             Type       = 'Release'
-            Version    = 'latest'
+            Version    = '0.14.2'
         }
     )
     Repositories = @(

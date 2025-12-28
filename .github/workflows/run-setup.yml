@@ -64,7 +64,8 @@ jobs:
         uses: potatoqualitee/psmodulecache@v6.2.1
         with:
           modules-to-cache: ${{ steps.resolve-dependencies.outputs.module-list }}
-          updatable: true
+          shell: pwsh
+          updatable: false
 
       - name: Verify installed modules
         shell: pwsh
