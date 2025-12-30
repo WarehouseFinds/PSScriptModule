@@ -21,6 +21,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/help/**'
   pull_request:
     branches:
       - main

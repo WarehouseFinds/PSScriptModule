@@ -32,7 +32,7 @@ jobs:
         shell: pwsh
         run: |
           Set-StrictMode -Version Latest
-          Invoke-Build -Task UnitTest
+          Invoke-Build -Task Invoke-UnitTests
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2

@@ -1,1 +1,0 @@
-@{ Path = "src/PSScriptModule.Template.psd1" }

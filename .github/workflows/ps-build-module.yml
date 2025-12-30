@@ -54,8 +54,25 @@ jobs:
         shell: pwsh
         run: |
           Set-StrictMode -Version Latest
-          Import-Module InvokeBuild -ErrorAction Stop
-          Invoke-Build -ReleaseType Release -SemanticVersion ${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }} -Task Build
+          [void] (Import-Module InvokeBuild)
+          $requestParam = @{
+              ReleaseType     = 'Release'
+              SemanticVersion = '${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}'
+              Task            = 'Build'
+          }
+          [void] (Invoke-Build @requestParam)
+
+      - name: Run Export-CommandHelp via Invoke-Build
+        if: github.ref_name == 'main'
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          [void] (Import-Module InvokeBuild)
+          $requestParam = @{
+              SemanticVersion = '${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}'
+              Task            = 'Export-CommandHelp'
+          }
+          [void] (Invoke-Build @requestParam)
 
       - name: Upload build artifacts (if any)
         uses: actions/upload-artifact@v4
@@ -64,6 +81,24 @@ jobs:
           path: build/**
           if-no-files-found: warn
 
+      - name: Commit generated help
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No help changes to commit"
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add docs/help
+          git commit -m "Update PowerShell help for release v${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}"
+
+      - name: Push help updates
+        run: |
+          git push origin HEAD:main
+
       - name: Publish build via Invoke-Build
         # Change 'namerno' to the desired event name to enable publishing
         if: github.event_name == 'namerno' 
@@ -71,9 +106,8 @@ jobs:
         env:
           NuGetApiKey: ${{ secrets.NuGetApiKey_PSGallery }}
         run: |
-          $VerbosePreference = 'Continue'
           Set-StrictMode -Version Latest
-          Import-Module InvokeBuild -ErrorAction Stop
+          [void] (Import-Module InvokeBuild)
           Invoke-Build -NugetApiKey ${{ env.NuGetApiKey }} -Task Publish
 
       # Create a new tag based on the version determined by GitVersion

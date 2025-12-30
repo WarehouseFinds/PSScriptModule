@@ -2,10 +2,10 @@
 
 <#
 .SYNOPSIS
-    Build script (https://github.com/nightroman/Invoke-Build)
+    Build script for the 'PSScriptModule' PowerShell module
 
 .DESCRIPTION
-    This script contains the tasks for building the 'SampleModule' PowerShell module
+    This script contains the tasks for building the 'PSScriptModule' PowerShell module
 #>
 [CmdletBinding()]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '',
@@ -27,12 +27,8 @@ param (
     $NugetApiKey
 )
 
-# Enforce strict mode for better scripting practices
-Set-StrictMode -Version Latest
-
 # Synopsis: Default task
 task . Clean, Build
-
 
 # Setup build environment
 Enter-Build {
@@ -40,17 +36,16 @@ Enter-Build {
     $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath 'src'
     $script:testSourcePath = Join-Path -Path $BuildRoot -ChildPath 'tests'
     $script:testOutputPath = Join-Path -Path $BuildRoot -ChildPath 'test-results'
-    $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
-    $script:publishSourcePath = Join-Path -Path $buildOutputPath -ChildPath $moduleName
+    $script:buildPath = Join-Path -Path $BuildRoot -ChildPath 'build'
+    $script:helpPath = Join-Path -Path $BuildRoot -ChildPath 'docs/help'
 }
 
 # Synopsis: Analyze the project with PSScriptAnalyzer
-task PSScriptAnalyzer {
-    # Create test output folder
+task Invoke-PSScriptAnalyzer {
     if (-not (Test-Path $testOutputPath)) {
         [void] (New-Item -Path $testOutputPath -ItemType Directory)
     }
-    $Config = New-PesterConfiguration @{
+    $config = New-PesterConfiguration @{
         Run        = @{
             Path = (Join-Path -Path $testSourcePath -ChildPath 'PSScriptAnalyzer')
             Exit = $true
@@ -63,16 +58,13 @@ task PSScriptAnalyzer {
     }
 
     # Invoke all tests
-    Invoke-Pester -Configuration $Config
+    Invoke-Pester -Configuration $config
 }
 
 # Synopsis: Scan the project with Injection Hunter
-task InjectionHunter {
-    # Create test output folder
-    if (-not (Test-Path $testOutputPath)) {
-        [void] (New-Item -Path $testOutputPath -ItemType Directory)
-    }
-    $Config = New-PesterConfiguration @{
+task Invoke-InjectionHunter {
+
+    $config = New-PesterConfiguration @{
         Run        = @{
             Path = (Join-Path -Path $testSourcePath -ChildPath 'InjectionHunter')
             Exit = $true
@@ -84,21 +76,16 @@ task InjectionHunter {
         }
     }
 
-    # Invoke all tests
-    Invoke-Pester -Configuration $Config
+    Invoke-Pester -Configuration $config
 }
 
-# Synopsis: Run Pester tests Unit tests and generate code coverage report
-task UnitTest {
-    # Create test output folder
-    if (-not (Test-Path $testOutputPath)) {
-        [void] (New-Item -Path $testOutputPath -ItemType Directory)
-    }
+# Synopsis: Run unit tests and generate code coverage report
+task Invoke-UnitTests {
 
-    $unitContainer = New-PesterContainer -Path $Script:moduleSourcePath -Data @{ SourcePath = $script:moduleSourcePath }
-    $unitConfig = New-PesterConfiguration @{
+    $container = New-PesterContainer -Path $Script:moduleSourcePath -Data @{ SourcePath = $script:moduleSourcePath }
+    $config = New-PesterConfiguration @{
         Run          = @{
-            Container = $unitContainer
+            Container = $container
             PassThru  = $true
             Exit      = $true
         }
@@ -116,27 +103,79 @@ task UnitTest {
         }
     }
     # Invoke all tests
-    Invoke-Pester -Configuration $unitConfig -Verbose
+    Invoke-Pester -Configuration $config -Verbose
+}
+
+# Synopsis: Generate module help documentation
+task Export-CommandHelp {
+
+    # Import the module being built and PlatyPS module
+    [void] (Import-Module (Join-Path -Path $buildPath -ChildPath "out/$moduleName/$moduleName.psd1") -Force)
+    [void] (Import-Module 'Microsoft.PowerShell.PlatyPS')
+
+    # Generate markdown help files
+    $requestParam = @{
+        CommandInfo    = (Get-Command -Module $moduleName)
+        OutputFolder   = "$buildPath/help"
+        HelpVersion    = $SemanticVersion
+        WithModulePage = $true
+        Force          = $true
+    }
+    [void] (New-MarkdownCommandHelp @requestParam)
+
+    # Validate generated markdown help files
+    $helpFiles = Measure-PlatyPSMarkdown -Path "$buildPath/help/PSScriptModule/*.md"
+    foreach ($helpFile in $helpFiles) {
+        [void] (Test-MarkdownCommandHelp -Path $helpFile.FilePath)
+    }
+
+    # Generate module help file
+    $mdfiles = Measure-PlatyPSMarkdown -Path "$buildPath/help/PSScriptModule/*.md" | Where-Object Filetype -Match 'CommandHelp'
+    foreach ($mdfile in $mdfiles) {
+        $markdownCommandHelp = Import-MarkdownCommandHelp -Path $mdfile.FilePath
+        $requestParam = @{
+            CommandHelp  = $markdownCommandHelp
+            OutputFolder = (Join-Path -Path $buildPath -ChildPath "out/$moduleName/en-US")
+            Force        = $true
+        }
+        [void] (Export-MamlCommandHelp @requestParam)
+    }
+
+    # Copy generated command help files to docs/help
+    if (Test-Path $helpPath) {
+        [void] (Remove-Item -Path $helpPath -Recurse -Force)
+    }
+    [void] (New-Item -Path $helpPath -ItemType Directory -Force)
+    [void] ($mdfiles | ForEach-Object { Copy-Item -Path $_.FilePath -Destination $helpPath -Force })
 }
 
 # Synopsis: Build the project
 task Build Clean, {
-    # Warning on local builds
-    if ($ReleaseType -ne 'Release') {
-        Write-Warning 'THIS IS A DEBUG BUILD. THE MODULE IS NOT SUITABLE FOR PRODUCTION USE.'
-    }
 
-    # Create build output folder
-    if (-not (Test-Path $buildOutputPath)) {
-        Write-Warning "Creating build output folder at '$buildOutputPath'"
-        [void] (New-Item -Path $buildOutputPath -ItemType Directory)
+    # Copy src directory to ./build folder
+    $requestParam = @{
+        Destination = (Join-Path -Path $buildPath -ChildPath 'src')
+        Path        = $Script:moduleSourcePath
+        Container   = $true
+        Recurse     = $true
+        Force       = $true
     }
+    [void] (Copy-Item @requestParam)
 
-    # Copy-Item parameters
+    # Remove tests files if present (*.Tests.ps1)
+    $requestParam = @{
+        Path    = (Join-Path -Path $buildPath -ChildPath 'src')
+        Filter  = '*.Tests.ps1'
+        Recurse = $true
+        File    = $true
+    }
+    [void] (Get-ChildItem @requestParam | Remove-Item -Force)
+
+    # Build Powershell module
     Import-Module ModuleBuilder -ErrorAction Stop
     $requestParam = @{
-        Path                       = $BuildRoot
-        OutputDirectory            = $buildOutputPath
+        Path                       = (Join-Path -Path $buildPath -ChildPath "src/$moduleName.psd1")
+        OutputDirectory            = (Join-Path -Path $buildPath -ChildPath "out/$moduleName")
         SemVer                     = $SemanticVersion
         UnversionedOutputDirectory = $true
         ErrorAction                = 'Stop'
@@ -147,7 +186,7 @@ task Build Clean, {
 # Synopsis: Publish the module to PSGallery
 task Publish -If ($NugetApiKey) {
     $requestParam = @{
-        Path        = $publishSourcePath
+        Path        = (Join-Path -Path $buildPath -ChildPath "out/$moduleName")
         NuGetApiKey = $NugetApiKey
         ErrorAction = 'Stop'
     }
@@ -156,10 +195,10 @@ task Publish -If ($NugetApiKey) {
 
 # Synopsis: Clean up the target build directory
 task Clean {
-    if (Test-Path $buildOutputPath) {
-        Write-Warning "Removing build output folder at '$buildOutputPath'"
+    if (Test-Path $buildPath) {
+        Write-Warning "Removing build output folder at '$buildPath'"
         $requestParam = @{
-            Path    = $buildOutputPath
+            Path    = $buildPath
             Recurse = $true
             Force   = $true
         }

@@ -32,10 +32,10 @@
             Version    = '1.0.0'
         }
         @{
-            Name       = 'platyPS'
+            Name       = 'Microsoft.PowerShell.PlatyPS'
             Repository = 'PSGallery'
             Type       = 'Release'
-            Version    = '0.14.2'
+            Version    = '1.0.1'
         }
     )
     Repositories = @(
