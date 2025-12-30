@@ -95,3 +95,5 @@ jobs:
       tag-version: ${{ inputs.tag-version || '' }}
       publish: ${{ inputs.publish || false }}
       module-list: ${{ needs.setup.outputs.module-list }}
+    secrets:
+      NUGETAPIKEY_PSGALLERY: ${{ secrets.NUGETAPIKEY_PSGALLERY }}
