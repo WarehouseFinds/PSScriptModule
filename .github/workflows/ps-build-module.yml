@@ -82,6 +82,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit generated help
+        if: github.ref_name == 'main'
         shell: bash
         run: |
           if git diff --quiet; then
@@ -96,6 +97,8 @@ jobs:
           git commit -m "Update PowerShell help for release v${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}"
 
       - name: Push help updates
+        if: github.ref_name == 'main'
+        shell: bash
         run: |
           git push origin HEAD:main
 
