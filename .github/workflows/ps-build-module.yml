@@ -83,6 +83,14 @@ jobs:
           path: build/**
           if-no-files-found: warn
 
+      # Create a new tag based on the version determined by GitVersion
+      # This is done BEFORE committing help to ensure the tag points to the verified PR merge commit
+      - name: Create Release Tag
+        if: github.ref_name == 'main'
+        run: |
+          git tag v${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}
+          git push origin tag v${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}
+
       - name: Commit generated help
         if: github.ref_name == 'main'
         shell: bash
@@ -116,10 +124,3 @@ jobs:
           Set-StrictMode -Version Latest
           [void] (Import-Module InvokeBuild)
           Invoke-Build -NugetApiKey ${{ env.NuGetApiKey }} -Task Publish
-
-      # Create a new tag based on the version determined by GitVersion
-      - name: Create Release Tag
-        if: github.ref_name == 'main'
-        run: |
-          git tag v${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}
-          git push origin tag v${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}
