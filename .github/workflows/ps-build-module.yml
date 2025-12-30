@@ -66,7 +66,10 @@ jobs:
         if: github.ref_name == 'main'
         shell: pwsh
         run: |
-          Set-StrictMode -Version Latest
+          # PlatyPS 1.0.1+ is not compatible with Set-StrictMode
+          # New-MarkdownCommandHelp fails with:
+          #  The property 'inputTypes' cannot be found on this object. Verify that the property exists.
+          Set-StrictMode -off
           [void] (Import-Module InvokeBuild)
           $requestParam = @{
               SemanticVersion = '${{ steps.version_step.outputs.GitVersion_MajorMinorPatch }}'
