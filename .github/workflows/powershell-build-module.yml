@@ -144,8 +144,10 @@ jobs:
             Body        = $body
             ContentType = 'application/json'
           }
-          $result = Invoke-RestMethod @requestParams
-          echo "releaseNotes=$($result.body)" >> $env:GITHUB_OUTPUT
+          $body = "@
+          $($result.body)
+          @"
+          Write-Output "releaseNotes=$body" >> $env:GITHUB_OUTPUT
 
       - name: Create Release
         id: create_release
