@@ -174,28 +174,31 @@ task Build Clean, {
     }
     [void] (Get-ChildItem @requestParam | Remove-Item -Force)
 
+    # Add pre-release tag if needed
+    switch ($ReleaseType) {
+        'Release' {
+            # e.g. 1.2.4-5  ->  1.2.4
+            $semVer = $SemanticVersion.Split('-', 2)[0]
+        }
+        'Prerelease' {
+            # e.g. 1.2.4-5  ->  1.2.4-Prerelease-5
+            $semVer = $SemanticVersion.Split('-', 2)[0] + '-Prerelease' + $SemanticVersion.Split('-', 2)[1]
+        }
+        'Debug' {
+            # 1.2.4-PullRequest1234 -> 1.2.4-PullRequest1234
+            $semVer = $SemanticVersion
+        }
+    }
+
     # Build Powershell module
     [void] (Import-Module ModuleBuilder)
     $requestParam = @{
         Path                       = (Join-Path -Path $buildPath -ChildPath "src/$moduleName.psd1")
         OutputDirectory            = (Join-Path -Path $buildPath -ChildPath "out/$moduleName")
-        SemVer                     = $SemanticVersion
+        SemVer                     = $semVer
         UnversionedOutputDirectory = $true
         ErrorAction                = 'Stop'
     }
-    <#     # Add pre-release tag if needed
-    if ($ReleaseType -ne 'Release') {
-        # The module version (must be a valid System.Version such as PowerShell supports for modules)
-        $requestParam.[version]$Version = (($SemanticVersion.Split('+')[0].Split('-', 2)[0])),
-        # Setting pre-release forces the release to be a pre-release.
-        # Must be valid pre-release tag like PowerShellGet supports
-        $requestParam['Prerelease'] = $($SemanticVersion.Split('+')[0].Split('-', 2)[1])
-
-        # Build metadata (like the commit sha or the date).
-        # If a value is provided here, then the full Semantic version will be inserted to the release notes:
-        # Like: ModuleName v(Version(-Prerelease?)+BuildMetadata)
-        $requestParam['BuildMetadata'] = $($SemanticVersion.Split('+', 2)[1])
-    } #>
     Build-Module @requestParam
 }
 
