@@ -141,7 +141,7 @@ jobs:
             -Body $body `
             -ContentType 'application/json'
 
-          echo "releaseNotes=$result.body" >> $env:GITHUB_ENV
+          echo "releaseNotes=$($result.body)" >> $env:GITHUB_ENV
 
       - name: Create Release
         id: create_release
