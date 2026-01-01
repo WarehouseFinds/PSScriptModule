@@ -77,6 +77,7 @@ jobs:
               'Prerelease' {
                   # e.g. 1.2.4-5  ->  1.2.4-Prerelease-5
                   $releaseVersion = $env:semVer.Split('-', 2)[0] + '-Prerelease'
+              }
               'Debug' {
                   # 1.2.4-PullRequest1234 -> 1.2.4-PullRequest1234
                   $releaseVersion = $env:semVer
