@@ -120,7 +120,8 @@ task Export-CommandHelp {
     $requestParam = @{
         CommandInfo    = (Get-Command -Module $moduleName)
         OutputFolder   = "$buildPath/help"
-        HelpVersion    = $SemanticVersion
+        # Full semantic version is not supported in HelpVersion
+        HelpVersion    = ($SemanticVersion.Split('-', 2)[0])
         WithModulePage = $true
         Force          = $true
     }
@@ -174,28 +175,28 @@ task Build Clean, {
     }
     [void] (Get-ChildItem @requestParam | Remove-Item -Force)
 
+    # Add pre-release tag if needed
+    switch ($ReleaseType) {
+        'Release' {
+            $semVer = $SemanticVersion
+        }
+        'Prerelease' {
+            $semVer = "$SemanticVersion-PR$($env:GITHUB_RUN_ID)"
+        }
+        'Debug' {
+            $semVer = "$SemanticVersion-Debug$($env:GITHUB_RUN_ID)"
+        }
+    }
+
     # Build Powershell module
     [void] (Import-Module ModuleBuilder)
     $requestParam = @{
         Path                       = (Join-Path -Path $buildPath -ChildPath "src/$moduleName.psd1")
         OutputDirectory            = (Join-Path -Path $buildPath -ChildPath "out/$moduleName")
-        SemVer                     = $SemanticVersion
+        SemanticVersion            = $SemVer
         UnversionedOutputDirectory = $true
         ErrorAction                = 'Stop'
     }
-    <#     # Add pre-release tag if needed
-    if ($ReleaseType -ne 'Release') {
-        # The module version (must be a valid System.Version such as PowerShell supports for modules)
-        $requestParam.[version]$Version = (($SemanticVersion.Split('+')[0].Split('-', 2)[0])),
-        # Setting pre-release forces the release to be a pre-release.
-        # Must be valid pre-release tag like PowerShellGet supports
-        $requestParam['Prerelease'] = $($SemanticVersion.Split('+')[0].Split('-', 2)[1])
-
-        # Build metadata (like the commit sha or the date).
-        # If a value is provided here, then the full Semantic version will be inserted to the release notes:
-        # Like: ModuleName v(Version(-Prerelease?)+BuildMetadata)
-        $requestParam['BuildMetadata'] = $($SemanticVersion.Split('+', 2)[1])
-    } #>
     Build-Module @requestParam
 }
 
