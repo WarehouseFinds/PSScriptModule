@@ -72,15 +72,15 @@ jobs:
           switch ($releaseType) {
               'Release' {
                   # e.g. 1.2.4-5  ->  1.2.4
-                  $releaseVersion = $SemanticVersion.Split('-', 2)[0]
+                  $releaseVersion = $env:semVer.Split('-', 2)[0]
               }
               'Prerelease' {
                   # e.g. 1.2.4-5  ->  1.2.4-Prerelease-5
-                  $releaseVersion = $SemanticVersion.Split('-', 2)[0] + '-Prerelease-' + $SemanticVersion.Split('-', 2)[1]
+                  $releaseVersion = $env:semVer.Split('-', 2)[0] + '-Prerelease-' + $env:semVer.Split('-', 2)[1]
               }
               'Debug' {
                   # 1.2.4-PullRequest1234 -> 1.2.4-PullRequest1234
-                  $releaseVersion = $SemanticVersion
+                  $releaseVersion = $env:semVer
               }
           }
           echo "releaseVersion=$releaseVersion" >> $env:GITHUB_ENV
