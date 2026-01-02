@@ -35,6 +35,7 @@ This template solves the common challenge of setting up a professional PowerShel
 - **Code coverage reporting** (Cobertura format)
 - **PSScriptAnalyzer integration** for static code analysis
 - **InjectionHunter security scanning** for injection vulnerability detection
+- **CodeQL semantic analysis** for advanced security scanning
 - **Test results in NUnit XML format** for CI/CD integration
 
 ### 📚 Documentation Generation
@@ -54,6 +55,8 @@ This template solves the common challenge of setting up a professional PowerShel
 - **Automated quality gates** (tests, analysis, security scans)
 - **Automated releases** on PR merges to main
 - **PowerShell Gallery publishing** support
+- **Automated cleanup workflows** for managing artifacts and workflow runs
+- **Manual workflow dispatch** with version control and publishing options
 
 ### 📦 Dependency Management
 - **PSDepend** for managing module dependencies
@@ -72,11 +75,11 @@ PSScriptModule.Template/
 ├── 📁 src/                          # Source code
 │   ├── 📄 PSScriptModule.psd1      # Module manifest
 │   ├── 📁 Public/                   # Public functions (exported)
-│   │   ├── Get-Example.ps1
-│   │   └── Get-Example.Tests.ps1
+│   │   ├── Get-PSScriptModuleInfo.ps1
+│   │   └── Get-PSScriptModuleInfo.Tests.ps1
 │   └── 📁 Private/                  # Private functions (internal only)
-│       ├── HelperFunction.ps1
-│       └── HelperFunction.Tests.ps1
+│       ├── GetModuleId.ps1
+│       └── GetModuleId.Tests.ps1
 ├── 📁 tests/                        # Test suites
 │   ├── 📁 PSScriptAnalyzer/        # Static code analysis tests
 │   │   ├── PSScriptAnalyzer.Tests.ps1
@@ -84,7 +87,7 @@ PSScriptModule.Template/
 │   └── 📁 InjectionHunter/         # Security vulnerability tests
 │       └── InjectionHunter.Tests.ps1
 ├── 📁 docs/help/                    # Markdown documentation
-│   └── Get-Example.md
+│   └── Get-PSScriptModuleInfo.md
 └── 📁 build/                        # Build output (generated)
     ├── 📁 src/                      # Copied source for building
     ├── 📁 out/                      # Compiled module output
@@ -168,7 +171,7 @@ Invoke-Build Invoke-PSScriptAnalyzer  # Code analysis only
 Invoke-Build Invoke-InjectionHunter   # Security scans only
 
 # Run Pester directly
-Invoke-Pester -Path ./src/Public/Get-Example.Tests.ps1
+Invoke-Pester -Path ./src/Public/Get-PSScriptModuleInfo.Tests.ps1
 
 # Run with code coverage
 Invoke-Pester -Configuration @{
@@ -207,10 +210,42 @@ Help files are generated in two formats:
 Import-Module ./build/out/PSScriptModule/PSScriptModule.psd1
 
 # View help
-Get-Help Get-Example -Full
-Get-Help Get-Example -Examples
-Get-Help Get-Example -Online
+Get-Help Get-PSScriptModuleInfo -Full
+Get-Help Get-PSScriptModuleInfo -Examples
+Get-Help Get-PSScriptModuleInfo -Online
 ```
+
+## 🔄 CI/CD Pipeline
+
+The template includes a comprehensive CI/CD pipeline that runs automatically on pull requests and pushes to main.
+
+### Pipeline Structure
+
+The CI workflow orchestrates multiple jobs in parallel:
+
+1. **Setup** - Caches PowerShell module dependencies for faster builds
+2. **Unit Tests** - Runs Pester tests with code coverage reporting
+3. **Static Code Analysis** - Validates code with PSScriptAnalyzer rules
+4. **Code Injection Analysis** - Scans for injection vulnerabilities with InjectionHunter
+5. **Semantic Code Analysis** - Runs CodeQL security analysis
+6. **Build** - Compiles module, generates help, creates releases, and publishes to PowerShell Gallery
+
+### Workflow Triggers
+
+- **Pull Request**: Runs all quality gates (tests not run for workflow-only changes)
+- **Push to main**: Runs full pipeline and creates prerelease
+- **Workflow Dispatch**: Manual trigger with custom version and publish options
+- **Schedule**: Weekly CodeQL security scan
+
+### Build Types
+
+The pipeline automatically determines the build type:
+
+| Event | Build Type | Version Format | Published |
+|-------|-----------|----------------|-----------|
+| Pull Request | Debug | `1.2.3-PullRequest1234` | No |
+| Push to main | Prerelease | `1.2.3-Prerelease` | Yes |
+| Manual (workflow_dispatch) | Release | `1.2.3` | Optional |
 
 ## 🔄 Versioning Strategy
 
@@ -292,7 +327,7 @@ git commit -m "Update README +semver: none"
 3. **Update module manifest** if adding public function:
    ```powershell
    # Add to FunctionsToExport in PSScriptModule.psd1
-   FunctionsToExport = @('Get-Example', 'Get-Something')
+   FunctionsToExport = @('Get-PSScriptModuleInfo', 'Get-Something')
    ```
 
 4. **Build and test**:
@@ -320,9 +355,24 @@ Invoke-Build -ReleaseType Release -NugetApiKey 'YOUR-API-KEY'
 ### Automated Publishing (CI/CD)
 
 Configure your GitHub repository secrets:
-- `NUGET_API_KEY` - Your PowerShell Gallery API key
+- `NUGETAPIKEY_PSGALLERY` - Your PowerShell Gallery API key
 
 The CI/CD pipeline will automatically publish on release.
+
+### Manual Workflow Dispatch
+
+You can manually trigger builds and releases via GitHub Actions workflow dispatch:
+
+1. **Navigate to Actions** → CI workflow
+2. **Click "Run workflow"** 
+3. **Configure options**:
+   - `version-tag`: Specify a version tag to build (e.g., `v0.9.7`) - leave empty to use current commit
+   - `publish`: Check to publish the release to PowerShell Gallery
+
+This is useful for:
+- Creating releases from specific commits or tags
+- Re-publishing existing versions
+- Testing release workflows before merging to main
 
 ## 🤝 Contributing
 
@@ -392,6 +442,25 @@ Generates professional documentation:
 - MAML files for PowerShell's Get-Help
 - Module-level documentation
 - Example sections for usage
+
+### CodeQL Semantic Analysis
+
+Advanced security scanning with GitHub CodeQL:
+- Runs weekly on a schedule
+- Integrates with GitHub Security tab
+- Detects complex security vulnerabilities
+- Provides actionable security insights
+
+### Automated Maintenance Workflows
+
+Keep your repository clean with automated maintenance:
+- **Artifact Cleanup**: Automatically removes artifacts older than 2 days (configurable)
+- **Workflow Run Cleanup**: Removes old workflow runs to keep history manageable
+  - Configurable retention period (default: 2 days)
+  - Configurable minimum runs to keep (default: 2)
+  - Separate cleanup for pull requests, pushes, and scheduled runs
+- Runs daily at midnight via cron schedule
+- Can be triggered manually with custom parameters
 
 ## 🎓 Learning Resources
 
