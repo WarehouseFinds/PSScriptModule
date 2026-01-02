@@ -132,7 +132,7 @@ jobs:
           $body = @{
             tag_name = 'v${{ env.majorMinorPatch }}'
             target_commitish = "main"
-            previous_tag_name = git describe --tags --abbrev=0 HEAD^ 2>$null
+            previous_tag_name = git describe --tags --abbrev=0 HEAD^
           } | ConvertTo-Json
 
           $requestParams = @{
