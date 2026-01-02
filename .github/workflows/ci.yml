@@ -35,7 +35,7 @@ jobs:
     name: Unit Tests
     needs: [setup]
     uses: ./.github/workflows/powershell-unit-tests.yml
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     permissions:
       issues: write
       pull-requests: write
@@ -47,7 +47,7 @@ jobs:
     name: Static Code Analysis
     needs: [setup]
     uses: ./.github/workflows/powershell-static-code-analysis.yml
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     permissions:
       issues: write
       pull-requests: write
@@ -59,7 +59,7 @@ jobs:
     name: Code Injection
     needs: [setup]
     uses: ./.github/workflows/powershell-code-injection-analysis.yml
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     permissions:
       issues: write
       pull-requests: write
@@ -71,7 +71,7 @@ jobs:
     name: Semantic Code Analysis
     needs: [setup]
     uses: ./.github/workflows/powershell-semantic-code-analysis.yml
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     permissions:
       security-events: write
       actions: read
@@ -80,7 +80,7 @@ jobs:
 
   build:
     name: Build
-    needs: [setup] #, unit-tests, static-code-analysis]
+    needs: [setup, unit-tests, static-code-analysis, code-injection, semantic-code-analysis]
     uses: ./.github/workflows/powershell-build-module.yml
     permissions:
       contents: write
