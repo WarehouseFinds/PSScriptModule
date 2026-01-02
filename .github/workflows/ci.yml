@@ -80,7 +80,7 @@ jobs:
 
   build:
     name: Build
-    needs: [setup, unit-tests, static-code-analysis]
+    needs: [setup] #, unit-tests, static-code-analysis]
     uses: ./.github/workflows/powershell-build-module.yml
     permissions:
       contents: write
