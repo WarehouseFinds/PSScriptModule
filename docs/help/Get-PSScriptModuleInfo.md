@@ -4,7 +4,7 @@ external help file: PSScriptModule-Help.xml
 HelpUri: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/import-powershelldatafile
 Locale: en-US
 Module Name: PSScriptModule
-ms.date: 01/01/2026
+ms.date: 01/02/2026
 PlatyPS schema version: 2024-05-01
 title: Get-PSScriptModuleInfo
 ---
