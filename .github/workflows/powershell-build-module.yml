@@ -148,8 +148,9 @@ jobs:
           $body = @"
           $($result.body)
           "@
-          Write-Host $requestParams.previous_tag_name
-          Write-Host $body
+          Write-Verbose $requestParams.previous_tag_name
+          Write-Verbose $body
+          Write-Verbose $result.body
           Write-Output "releaseNotes=$body" >> $env:GITHUB_OUTPUT
 
       - name: Create Release
