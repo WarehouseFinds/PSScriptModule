@@ -128,7 +128,7 @@ jobs:
           git fetch --tags
           $previousTag = git tag --sort=-v:refname |
             Where-Object { $_ -match '^v?\d+\.\d+\.\d+' } |
-            Select-Object -First 1
+            Select-Object -Skip 1 -First 1
           $uri = "https://api.github.com/repos/${{ github.repository }}/releases/generate-notes"
 
           $body = @{

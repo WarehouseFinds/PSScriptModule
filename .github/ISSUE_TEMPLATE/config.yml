@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/YourUsername/PSScriptModule/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: Security Issues
+    url: https://github.com/YourUsername/PSScriptModule/security/advisories/new
+    about: Report security vulnerabilities privately
