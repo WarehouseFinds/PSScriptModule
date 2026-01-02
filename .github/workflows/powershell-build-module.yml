@@ -3,7 +3,7 @@ on:
   workflow_call:
     inputs:
       version-tag:
-        description: 'Version tag to use (e.g., 0.9.7 or v0.9.7) - leave empty to use current commit'
+        description: 'Version tag (e.g., v0.9.7) - leave empty to use latest commit'
         required: false
         type: string
       publish:
@@ -18,6 +18,7 @@ on:
     secrets:
       NUGETAPIKEY_PSGALLERY:
         description: 'NuGet API Key for publishing to PSGallery'
+        required: false
 
 jobs:
   build:
@@ -33,26 +34,27 @@ jobs:
           repository: ${{ github.repository }}
           ref: ${{ inputs['version-tag'] || '' }}
           fetch-depth: 0
+          fetch-tags: true
 
-      - name: Install GitVersion 6.5.1
+      - name: Install GitVersion tool
         uses: gittools/actions/gitversion/setup@d0139503a9321f76b4a417dfdc8aebcec24decdd #v4.2.0
         with:
           versionSpec: '6.5.1'
 
-      - name: Determine semantic version for build
+      - name: Get semantic build version
         uses: gittools/actions/gitversion/execute@d0139503a9321f76b4a417dfdc8aebcec24decdd #v4.2.0
         with:
           configFilePath: GitVersion.yml
           disableShallowCloneCheck: true
 
-      - name: Install and cache PowerShell modules
+      - name: Restore cached PowerShell modules
         uses: potatoqualitee/psmodulecache@ee5e9494714abf56f6efbfa51527b2aec5c761b8 #v6.2.1
         with:
           modules-to-cache: ${{ inputs['module-list'] }}
           shell: pwsh
           updatable: false
 
-      - name: Determine release type and version for build
+      - name: Determine release type and build version
         shell: pwsh
         run: |
           switch ("${{ github.event_name }}") {
@@ -125,33 +127,40 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git fetch --tags
-          $previousTag = git tag --sort=-v:refname |
-            Where-Object { $_ -match '^v?\d+\.\d+\.\d+' } |
-            Select-Object -Skip 1 -First 1
-          $uri = "https://api.github.com/repos/${{ github.repository }}/releases/generate-notes"
+          #git fetch --tags
+          # Find previous tag based on release type
+          # - For 'Prerelease', use the latest tag (Release notes are generated from last commit to latest tag)
+          # - For 'Release', use the second latest tag (Release notes are generated from last tag to second latest tag)
+          $tags = git tag --sort=-v:refname
+          switch ($releaseType) {
+            'Prerelease' { $previousTag = $tags[0] }
+            'Release'    { $previousTag = $tags[1] }
+            default { $previousTag = $tags[0] }
+          }
 
+          # Generate release notes via GitHub API
+          $uri = "https://api.github.com/repos/${{ github.repository }}/releases/generate-notes"
           $body = @{
             tag_name = 'v${{ env.majorMinorPatch }}'
             target_commitish = "main"
             previous_tag_name = $previousTag
           }
-
           $requestParams = @{
             Method      = 'Post'
             Uri         = $uri
             Headers     = @{
-              Authorization = "Bearer $env:GITHUB_TOKEN"
-              Accept = 'application/vnd.github+json'
+              Authorization = "Bearer ${{ env.GITHUB_TOKEN }}"
+              Accept        = 'application/vnd.github+json'
             }
-            Body        = ($body | ConvertTo-Json)
+            Body        = ($body | ConvertTo-Json -Depth 3)
             ContentType = 'application/json'
           }
           $result = Invoke-RestMethod @requestParams
 
-          Write-Output  'releaseNotes<<EOF' >> $env:GITHUB_OUTPUT
-          Write-Output  ($result.body.ToString()) >> $env:GITHUB_OUTPUT
-          Write-Output  'EOF' >> $env:GITHUB_OUTPUT
+          # Output release notes
+          Write-Output 'releaseNotes<<EOF' >> $env:GITHUB_OUTPUT
+          Write-Output ($result.body.ToString()) >> $env:GITHUB_OUTPUT
+          Write-Output 'EOF' >> $env:GITHUB_OUTPUT
 
       - name: Create release
         uses: ncipollo/release-action@v1
@@ -181,7 +190,7 @@ jobs:
           git push origin HEAD:main
 
       - name: Publish build package to PSGallery
-        if: github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push') 
+        if: github.ref_name == 'main' && (env.NUGETAPIKEY_PSGALLERY != '')
         shell: pwsh
         env:
           NUGETAPIKEY_PSGALLERY: ${{ secrets.NUGETAPIKEY_PSGALLERY }}
