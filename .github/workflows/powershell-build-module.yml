@@ -149,11 +149,7 @@ jobs:
             ContentType = 'application/json'
           }
           $result = Invoke-RestMethod @requestParams
-          $body = @"
-          notes<<EOF
-          $($result.body)
-          "EOF"
-          "@
+          $body = "$($results.body)"
           Write-Verbose $previousTag
           Write-Verbose $body
           Write-Verbose $result.body
