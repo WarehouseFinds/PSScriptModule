@@ -121,7 +121,7 @@ jobs:
       - name: Generate release notes
         shell: pwsh
         id: generate_release_notes
-        if: github.ref_name == 'main' && github.event_name == 'workflow_dispatch'
+        if: github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -153,19 +153,29 @@ jobs:
           Write-Output  ($result.body.ToString()) >> $env:GITHUB_OUTPUT
           Write-Output  'EOF' >> $env:GITHUB_OUTPUT
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
-        if: github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Create Release
+      #  id: create_release
+      #  uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
+      #  if: github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    tag_name: v${{ env.majorMinorPatch }}
+      #    release_name: Release v${{ env.majorMinorPatch }}
+      #    body: |
+      #      ${{ steps.generate_release_notes.outputs.releaseNotes }}
+      #    draft: false
+      #    prerelease: ${{ env.releaseType == 'Prerelease' }}
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: v${{ env.majorMinorPatch }}
-          release_name: Release ${{ env.releaseVersion }}
-          body: |
-            ${{ steps.generate_release_notes.outputs.releaseNotes }}
-          draft: false
+          name: Release v${{ env.majorMinorPatch }}
+          tag: v${{ env.majorMinorPatch }}
+          body: ${{ steps.generate_release_notes.outputs.releaseNotes }}
           prerelease: ${{ env.releaseType == 'Prerelease' }}
+          allowUpdates: true
+
 
       - name: Commit generated help
         if: github.ref_name == 'main' && github.event_name == 'push'
