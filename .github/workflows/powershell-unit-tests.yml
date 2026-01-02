@@ -52,7 +52,7 @@ jobs:
           dotnet-quality: 'ga'
 
       - name: Run ReportGenerator on Code Coverage Report
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.5.1
+        uses: danielpalme/ReportGenerator-GitHub-Action@ee0ae774f6d3afedcbd1683c1ab21b83670bdf8e #5.5.1
         with:
           reports: 'test-results/codecoverage/code-coverage.xml'
           targetdir: 'test-results/codecoverage/report'
@@ -62,12 +62,12 @@ jobs:
           tag: '${{ github.event_name }}[${{ github.ref }}]_SHA[${{ github.sha }}]'
           toolpath: 'reportgeneratortool'
 
+      - name: Publish code coverage summary
+        shell: bash
+        run: cat test-results/codecoverage/report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v4
         with:
           name: CoverageReport
           path: test-results/codecoverage/report
-
-      - name: Publish code coverage under job summary
-        run: cat test-results/codecoverage/report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
-        shell: bash
