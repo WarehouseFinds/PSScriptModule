@@ -1,4 +1,4 @@
-name: '[reusable] Powershell Script Module - Release'
+name: '[reusable] PS - Release'
 on:
   workflow_call:
     inputs:

@@ -1,4 +1,4 @@
-name: '[reusable] Powershell Script Module - Code Injection Analysis'
+name: '[reusable] PS - Code Injection Analysis'
 on:
   workflow_call:
     inputs:

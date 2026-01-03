@@ -1,4 +1,4 @@
-name: '[reusable] Powershell Script Module - Unit Tests'
+name: '[reusable] PS - Unit Tests'
 on:
   workflow_call:
     inputs:

@@ -1,4 +1,4 @@
-name: '[reusable] Powershell Script Module - CodeQL Analysis'
+name: '[reusable] PS - CodeQL Analysis'
 on:
   workflow_call:
   schedule:
