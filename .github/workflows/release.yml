@@ -3,25 +3,26 @@ run-name: Release • ${{ github.repository }} • ${{ github.event_name }} • 
 permissions: read-all
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
-      version-tag:
-        description: 'Version tag (e.g., v0.9.7) - leave empty to use latest commit'
-        required: false
-        type: string
-      publish:
+      release-type:
+        description: 'Release type'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Prerelease
+      publish-psgallery:
         description: 'Publish release to PSGallery'
         required: false
         type: boolean
-        default: false
-      module-list:
-        description: 'Comma-separated list of PowerShell modules to install and cache'
-        required: true
-        type: string
-    secrets:
-      NUGETAPIKEY_PSGALLERY:
-        description: 'NuGet API Key for publishing to PSGallery'
+        default: true
+      publish-nugetorg:
+        description: 'Publish release to NuGet.org'
         required: false
+        type: boolean
+        default: false
 
 jobs:
   setup:
@@ -35,7 +36,19 @@ jobs:
     permissions:
       contents: write
     with:
-      version-tag: ${{ inputs['version-tag'] || '' }}
+      module-list: ${{ needs.setup.outputs.module-list }}
+
+  release:
+    name: Release
+    needs: [build]
+    uses: WarehouseFinds/PSScriptModule/.github/workflows/powershell-script-module-release.yml@main
+    permissions:
+      contents: write
+    with:
+      release-type: ${{ inputs['release-type'] }}
+      publish-psgallery: ${{ inputs.publish-psgallery }}
+      publish-nugetorg: ${{ inputs.publish-nugetorg }}
       module-list: ${{ needs.setup.outputs.module-list }}
     secrets:
-      NUGETAPIKEY_PSGALLERY: ${{ secrets.NUGETAPIKEY_PSGALLERY }}
+      PSGALLERY-API-KEY: ${{ secrets.PSGALLERY-API-KEY }}
+      NUGETORG-API-KEY: ${{ secrets.NUGETORG-API-KEY }}

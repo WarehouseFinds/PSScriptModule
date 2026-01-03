@@ -3,13 +3,13 @@ run-name: CI Workflow • ${{ github.repository }} • ${{ github.event_name }} 
 permissions: read-all
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
       - 'src/**'
       - 'tests/**'
-      - '.github/workflows/**'
   pull_request:
     branches:
       - main
@@ -27,8 +27,7 @@ jobs:
   unit-tests:
     name: Unit Tests
     needs: [setup]
-    uses: WarehouseFinds/PSScriptModule/.github/workflows/powershell-unit-tests.yml@main
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    uses: WarehouseFinds/PSScriptModule/.github/workflows/powershell-script-module-analysis-unit-tests.yml@main
     permissions:
       issues: write
       pull-requests: write
@@ -40,7 +39,6 @@ jobs:
     name: Static Code Analysis
     needs: [setup]
     uses: WarehouseFinds/PSScriptModule/.github/workflows/powershell-script-module-analysis-static-code.yml@main
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
     permissions:
       issues: write
       pull-requests: write
@@ -52,7 +50,6 @@ jobs:
     name: Code Injection
     needs: [setup]
     uses: WarehouseFinds/PSScriptModule/.github/workflows/powershell-script-module-analysis-code-injection.yml@main
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
     permissions:
       issues: write
       pull-requests: write
@@ -63,8 +60,7 @@ jobs:
   semantic-code-analysis:
     name: Semantic Code Analysis
     needs: [setup]
-    uses: WarehouseFinds/PSScriptModule/.github/workflows/powershell-script-module-analysis-semantic-code.yml@main
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    uses: WarehouseFinds/PSScriptModule/.github/workflows/powershell-script-module-analysis-codeQL.yml@main
     permissions:
       security-events: write
       actions: read

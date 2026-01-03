@@ -2,22 +2,28 @@ name: Release PowerShell Script Module
 on:
   workflow_call:
     inputs:
-      version-tag:
-        description: 'Version tag (e.g., v0.9.7) - leave empty to use latest commit'
-        required: false
+      release-type:
+        description: 'Release type'
+        required: true
         type: string
-      publish:
+      publish-psgallery:
         description: 'Publish release to PSGallery'
-        required: false
+        required: true
         type: boolean
-        default: false
+      publish-nugetorg:
+        description: 'Publish release to NuGet.org'
+        required: true
+        type: boolean
       module-list:
         description: 'Comma-separated list of PowerShell modules to install and cache'
         required: true
         type: string
     secrets:
-      NUGETAPIKEY_PSGALLERY:
-        description: 'NuGet API Key for publishing to PSGallery'
+      PSGALLERY-API-KEY:
+        description: 'PSGallery API Key'
+        required: false
+      NUGETORG-API-KEY:
+        description: 'NuGet.org API Key'
         required: false
 
 jobs:
@@ -32,7 +38,6 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6.01
         with:
           repository: ${{ github.repository }}
-          ref: ${{ inputs['version-tag'] || '' }}
           fetch-depth: 0
       - name: Install GitVersion tool
         uses: gittools/actions/gitversion/setup@d0139503a9321f76b4a417dfdc8aebcec24decdd #v4.2.0
@@ -40,6 +45,7 @@ jobs:
           versionSpec: '6.5.1'
 
       - name: Get semantic build version
+        id: gitversion
         uses: gittools/actions/gitversion/execute@d0139503a9321f76b4a417dfdc8aebcec24decdd #v4.2.0
         with:
           configFilePath: GitVersion.yml
@@ -52,38 +58,21 @@ jobs:
           shell: pwsh
           updatable: false
 
-      - name: Determine release type and build version
+      - name: Determine release version
+        id: release-version
         shell: pwsh
         run: |
-          switch ("${{ github.event_name }}") {
-            'workflow_dispatch' { $releaseType = 'Release' }
-            'pull_request'      { $releaseType = 'Debug' }
-            'push' {
-              if ('${{ github.ref_name }}' -eq 'main') {
-                $releaseType = 'Prerelease'
-              } else {
-                $releaseType = 'Debug'
-              }
-            }
-            default { $releaseType = 'Debug' }
-          }
-          echo "releaseType=$releaseType" >> $env:GITHUB_ENV
-
-          switch ($releaseType) {
+          switch (${{inputs['release-type']}}) {
               'Release' {
                   # e.g. 1.2.4-5  ->  1.2.4
                   $releaseVersion = $env:semVer.Split('-', 2)[0]
               }
               'Prerelease' {
-                  # e.g. 1.2.4-5  ->  1.2.4-Prerelease-5
-                  $releaseVersion = $env:semVer.Split('-', 2)[0] + '-Prerelease'
-              }
-              'Debug' {
-                  # 1.2.4-PullRequest1234 -> 1.2.4-PullRequest1234
-                  $releaseVersion = $env:semVer
+                  # e.g. 1.2.4-5  ->  1.2.4-Preview-5
+                  $releaseVersion = $env:semVer.Split('-', 2)[0] + '-Preview-' + $env:semVer.Split('-', 2)[1]
               }
           }
-          echo "releaseVersion=$releaseVersion" >> $env:GITHUB_ENV
+          echo "releaseVersion=$releaseVersion" >> $env:GITHUB_OUTPUT
 
       - name: Run build via Invoke-Build
         shell: pwsh
@@ -91,7 +80,7 @@ jobs:
           Set-StrictMode -Version Latest
           [void] (Import-Module InvokeBuild)
           $requestParam = @{
-              SemanticVersion = '${{ env.releaseVersion }}'
+              SemanticVersion = '${{ steps.release-version.outputs.releaseVersion }}'
               Task            = 'Build'
           }
           Invoke-Build @requestParam
@@ -105,7 +94,7 @@ jobs:
           Set-StrictMode -off
           [void] (Import-Module InvokeBuild)
           $requestParam = @{
-              SemanticVersion = '${{ env.majorMinorPatch }}'
+              SemanticVersion = '${{ steps.gitversion.outputs.majorMinorPatch }}'
               Task            = 'Export-CommandHelp'
           }
           Invoke-Build @requestParam
@@ -114,32 +103,23 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6
         if: (!cancelled())
         with:
-          name: build-${{ env.semVer }}
+          name: release-build-${{ steps.release-version.outputs.releaseVersion }}
           path: build/**
           if-no-files-found: warn
 
       - name: Generate release notes
         shell: pwsh
         id: generate_release_notes
-        if: github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git fetch --tags
-          # Find previous tag based on release type
-          # - For 'Prerelease', use the latest tag (Release notes are generated from last commit to latest tag)
-          # - For 'Release', use the second latest tag (Release notes are generated from last tag to second latest tag)
-          $tags = git tag --sort=-v:refname
-          switch ($releaseType) {
-            'Prerelease' { $previousTag = $tags[0] }
-            'Release'    { $previousTag = $tags[1] }
-            default { $previousTag = $tags[0] }
-          }
+          $previousTag = (git tag --sort=-v:refname)[0]
 
           # Generate release notes via GitHub API
           $uri = "https://api.github.com/repos/${{ github.repository }}/releases/generate-notes"
           $body = @{
-            tag_name = 'v${{ env.majorMinorPatch }}'
+            tag_name = 'v${{ steps.gitversion.outputs.majorMinorPatch }}'
             target_commitish = "main"
             previous_tag_name = $previousTag
           }
@@ -162,37 +142,19 @@ jobs:
 
       - name: Create release
         uses: ncipollo/release-action@v1
-        if: github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
-
         with:
-          name: Release v${{ env.majorMinorPatch }}
-          tag: v${{ env.majorMinorPatch }}
+          name: Release v${{ steps.gitversion.outputs.majorMinorPatch }}
+          tag: v${{ steps.gitversion.outputs.majorMinorPatch }}
           body: ${{ steps.generate_release_notes.outputs.releaseNotes }}
-          prerelease: ${{ env.releaseType == 'Prerelease' }}
+          prerelease: ${{ inputs.release-type == 'Prerelease' }}
           allowUpdates: true
 
-
-      - name: Commit generated help
-        if: github.ref_name == 'main' && github.event_name == 'push'
-        shell: bash
-        run: |
-          git add docs/help
-          if git diff --cached --quiet; then
-            echo "No help changes to commit"
-            exit 0
-          fi
-
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Update PowerShell help for release v${{ env.majorMinorPatch }}"
-          git push origin HEAD:main
-
       - name: Publish build package to PSGallery
-        if: github.ref_name == 'main' && (env.NUGETAPIKEY_PSGALLERY != '')
+        if: inputs.publish-psgallery == true && env.PSGALLERY_API_KEY != ''
         shell: pwsh
         env:
-          NUGETAPIKEY_PSGALLERY: ${{ secrets.NUGETAPIKEY_PSGALLERY }}
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
         run: |
           Set-StrictMode -Version Latest
           [void] (Import-Module InvokeBuild)
-          Invoke-Build -NugetApiKey ${{ env.NUGETAPIKEY_PSGALLERY }} -Task Publish
+          Invoke-Build -NugetApiKey ${{ env.PSGALLERY_API_KEY }} -Task Publish

@@ -3,7 +3,7 @@ run-name: ${{ github.event_name }} •  Cleanup past workflow runs • ${{ githu
 on:
   schedule:
     # Every day at midnight
-    - cron: '0 0 * * *'
+    - cron: '0 0  * * *'
   workflow_dispatch:
     inputs:
       retain-days:
