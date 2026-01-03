@@ -1,4 +1,4 @@
-name: CI Build PowerShell Module
+name: '[reusable] Powershell Script Module - Build'
 on:
   workflow_call:
     inputs:

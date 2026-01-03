@@ -1,4 +1,4 @@
-name: CI Setup PowerShell Dependencies
+name: '[reusable] Powershell Script Module - Install/Cache Dependencies'
 permissions: read-all
 on:
   workflow_call:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   setup-powershell-dependencies:
-    name: Module Dependencies
+    name: Dependencies
     runs-on: [ubuntu-latest]
     outputs:
       module-list: ${{ steps.resolve-dependencies.outputs.module-list }}
