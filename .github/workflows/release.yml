@@ -1,5 +1,5 @@
 name: Release
-run-name: Release • ${{ github.event.repository.name }} • ${{ github.event_name }} • ${{ github.ref_name }}
+run-name: "${{ github.event.repository.name }} | Release | ${{ github.run_id }} | ${{ github.event_name }}"
 permissions: read-all
 
 on:

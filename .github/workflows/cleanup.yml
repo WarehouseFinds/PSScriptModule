@@ -1,5 +1,5 @@
 name: Cleanup
-run-name: "${{ github.event.repository.name }} | Cleanup | ${{ github.run_number }}"
+run-name: "${{ github.event.repository.name }} | Cleanup | ${{ github.run_id }} | ${{ github.event_name }}"
 on:
   schedule:
     # Every day at midnight
