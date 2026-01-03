@@ -74,5 +74,5 @@ jobs:
     permissions:
       contents: write
     with:
-      module-list: ${{ needs.setup.outputs.module-list }}
       release-type: 'Debug'
+      module-list: ${{ needs.setup.outputs.module-list }}

@@ -9,7 +9,7 @@ on:
 
 jobs:
   setup-powershell-dependencies:
-    name: PowerShell Dependencies
+    name: Module Dependencies
     runs-on: [ubuntu-latest]
     outputs:
       module-list: ${{ steps.resolve-dependencies.outputs.module-list }}
@@ -63,3 +63,4 @@ jobs:
           foreach ($moduleName in $moduleRequirements.Keys) {
               Get-Module -ListAvailable -Name $moduleName -ErrorAction Stop
           }
+

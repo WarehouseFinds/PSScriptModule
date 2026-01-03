@@ -6,17 +6,25 @@ on:
         description: 'Comma-separated list of PowerShell modules to install and cache'
         required: true
         type: string
-
       release-type:
         description: 'Type of release (e.g., Release, Prerelease, Debug)'
         required: false
         default: 'Debug'
         type: string
-
+    outputs:
+      build-version:
+        description: 'The build version [major.minor.patch[-prerelease][-commitcount]]'
+        value: ${{ jobs.build.outputs.build-version }}
+      release-version:
+        description: 'The release version generated using GitVersion [major.minor.patch]'
+        value: ${{ jobs.build.outputs.release-version }}
 jobs:
   build:
     name: PowerShell Module
     runs-on: [ubuntu-latest]
+    outputs:
+      build-version: ${{ steps.build-version.outputs.build-version }}
+      release-version: ${{ steps.gitversion.outputs.majorMinorPatch }}
     permissions:
       contents: write
 
@@ -50,21 +58,7 @@ jobs:
         id: build-version
         shell: pwsh
         run: |
-          switch ("${{ github.event_name }}") {
-            'workflow_dispatch' { $releaseType = 'Release' }
-            'pull_request'      { $releaseType = 'Debug' }
-            'push' {
-              if ('${{ github.ref_name }}' -eq 'main') {
-                $releaseType = 'Prerelease'
-              } else {
-                $releaseType = 'Debug'
-              }
-            }
-            default { $releaseType = 'Debug' }
-          }
-          echo "releaseType=$releaseType" >> $env:GITHUB_ENV
-
-          switch ($releaseType) {
+          switch ('${{ inputs.release-type }}') {
               'Release' {
                   # e.g. 1.2.4-5  ->  1.2.4
                   $buildVersion = $env:semVer.Split('-', 2)[0]
@@ -78,7 +72,7 @@ jobs:
                   $buildVersion = $env:semVer
               }
           }
-          echo "buildVersion=$buildVersion" >> $env:GITHUB_ENV
+          echo "build-version=$buildVersion" >> $env:GITHUB_OUTPUT -Append
 
       - name: Run build via Invoke-Build
         shell: pwsh
@@ -86,7 +80,7 @@ jobs:
           Set-StrictMode -Version Latest
           [void] (Import-Module InvokeBuild)
           $requestParam = @{
-              SemanticVersion = '${{ steps.build-version.outputs.buildVersion }}'
+              SemanticVersion = '${{ steps.build-version.outputs.build-version }}'
               Task            = 'Build'
           }
           Invoke-Build @requestParam
@@ -100,7 +94,7 @@ jobs:
           Set-StrictMode -off
           [void] (Import-Module InvokeBuild)
           $requestParam = @{
-              SemanticVersion = '${{ steps.build-version.outputs.majorMinorPatch }}'
+              SemanticVersion = '${{ steps.gitversion.outputs.majorMinorPatch }}'
               Task            = 'Export-CommandHelp'
           }
           Invoke-Build @requestParam
@@ -109,8 +103,8 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6
         if: (!cancelled())
         with:
-          name: build-${{ steps.build-version.outputs.semVer }}
-          path: build/**
+          name: build-v${{ steps.gitversion.outputs.majorMinorPatch }}
+          path: build
           if-no-files-found: warn
 
       - name: Commit generated help
@@ -125,7 +119,5 @@ jobs:
 
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Update PowerShell help for release v${{ steps.build-version.outputs.majorMinorPatch }}"
+          git commit -m "Update PowerShell help for release v${{ steps.gitversion.outputs.majorMinorPatch }}"
           git push origin HEAD:main
-
-
