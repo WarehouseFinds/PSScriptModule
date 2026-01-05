@@ -1,6 +1,14 @@
 {
     "recommendations": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
         "ms-vscode.powershell",
-        "ms-vscode.powershell-preview"
+        "ms-vscode.powershell-preview",
+        "editorconfig.editorconfig",
+        // GitHub Actions extension
+        "github.vscode-github-actions",
+        // Azure Pipelines extension
+        "ms-azure-devops.azure-pipelines",
+        "DavidAnson.vscode-markdownlint"
     ]
 }

@@ -10,7 +10,7 @@ on:
         description: 'Number of days to retain workflow runs'
         required: false
         type: number
-        default: 1
+        default: 2
       minimum-runs:
         description: 'Minimum number of recent workflow runs to retain'
         required: false
@@ -50,6 +50,6 @@ jobs:
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          delete_workflow_pattern: cleanup
-          retain_days: ${{ github.event.inputs.retain-days || 2 }}
-          keep_minimum_runs: ${{ github.event.inputs.minimum-runs || 2 }}
+          delete_workflow_pattern: cleanup.yml
+          retain_days: ${{ github.event.inputs.retain-days || 1 }}
+          keep_minimum_runs: ${{ github.event.inputs.minimum-runs || 1 }}

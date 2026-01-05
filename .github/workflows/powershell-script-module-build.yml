@@ -20,7 +20,7 @@ on:
         value: ${{ jobs.build.outputs.release-version }}
 jobs:
   build:
-    name: PowerShell Module
+    name: Module
     runs-on: [ubuntu-latest]
     outputs:
       build-version: ${{ steps.build-version.outputs.build-version }}
