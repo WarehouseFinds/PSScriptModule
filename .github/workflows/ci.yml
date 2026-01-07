@@ -18,7 +18,7 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'docs/*'
+      - 'docs/**'
       - '.github/**/*'
       - '*'
 
