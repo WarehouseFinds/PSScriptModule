@@ -24,6 +24,8 @@ on:
 
 jobs:
   changes:
+    name: Detect Changes
+    runs-on: [ubuntu-latest]
     outputs:
       src: ${{ steps.filter.outputs.src }}
       github: ${{ steps.filter.outputs.github }}
