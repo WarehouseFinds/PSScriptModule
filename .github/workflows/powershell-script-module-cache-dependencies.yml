@@ -25,27 +25,25 @@ jobs:
         run: |
           # Resolve module dependencies from requirements.psd1
           $moduleRequirements = Import-PowerShellDataFile -Path './requirements.psd1'
-          $moduleList = (
-              $moduleRequirements.GetEnumerator() |
-                  ForEach-Object {
-                      $moduleName = $_.Key
-                      $moduleInfo = $_.Value
-                      
-                      $name = if ($moduleInfo.Repository -and $moduleInfo.Repository -ne 'PSGallery') {
-                          "$($moduleInfo.Repository)\$moduleName"
-                      }
-                      else {
-                          $moduleName
-                      }
+          $moduleList = foreach ($module in $moduleRequirements.GetEnumerator()) {
+              $moduleName = $module.Key
+              $moduleInfo = $module.Value
 
-                      if ($moduleInfo.Version -and $moduleInfo.Version -ne 'latest') {
-                          "$($name):$($moduleInfo.Version)"
-                      }
-                      else {
-                          "$($name)"
-                      }
-                  }
-          ) -join ','
+              $name = if ($moduleInfo.Repository -and $moduleInfo.Repository -ne 'PSGallery') {
+                  "$($moduleInfo.Repository)\$moduleName"
+              }
+              else {
+                  $moduleName
+              }
+
+              if ($moduleInfo.Version -and $moduleInfo.Version -ne 'latest') {
+                  "$name`:$($moduleInfo.Version)"
+              }
+              else {
+                  $name
+              }
+          }
+          $moduleList = $moduleList | Sort-Object | Join-String -Separator ','
           "module-list=$moduleList" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Install and cache PowerShell modules
