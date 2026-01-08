@@ -18,7 +18,7 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'docs/*'
+      - 'docs/**'
       - '.github/**/*'
       - '*'
 
@@ -27,18 +27,13 @@ jobs:
     name: Label Changes
     runs-on: [ubuntu-latest]
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6.01
-
-      - name: Execute assign PR labels
-        id: action-assign-labels
-        uses: mauroalderete/action-assign-labels@v1
-        with:
-          pull-request-number: ${{ github.event.pull_request.number }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          conventional-commits: '.github/labeler.yml'
-          apply-changes: true
+    - name: Labeler
+      id: labeler
+      uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b #v6.0.1
 
   setup:
     name: Setup
