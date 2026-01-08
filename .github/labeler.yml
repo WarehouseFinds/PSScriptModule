@@ -70,9 +70,6 @@ feature:
 bugfix:
  - head-branch: ['^bugfix', 'bugfix', 'fix', 'patch', 'hotfix']
 
-release:
- - base-branch: 'main'
-
  # Conventional Commit-based labels
 conventional-commits:
 - type: 'bugfix'
