@@ -25,40 +25,10 @@ jobs:
       actions: write
       contents: read
     steps:
-      - name: Delete workflow runs (CI workflows)
+      - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@5bf9a1dac5c4d041c029f0a8370ddf0c5cb5aeb7  #v2.1
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          delete_workflow_pattern: ci
-          retain_days: ${{ github.event.inputs.retain-days || 2 }}
           keep_minimum_runs: ${{ github.event.inputs.minimum-runs || 2 }}
           check_pullrequest_exist: true
-
-      - name: Delete workflow runs (Release workflows)
-        uses: Mattraks/delete-workflow-runs@5bf9a1dac5c4d041c029f0a8370ddf0c5cb5aeb7  #v2.1
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          delete_workflow_pattern: release
-          retain_days: ${{ github.event.inputs.retain-days || 2 }}
-          keep_minimum_runs: ${{ github.event.inputs.minimum-runs || 2 }}
-          check_pullrequest_exist: true
-
-      - name: Delete workflow runs (Scheduled cleanup runs)
-        uses: Mattraks/delete-workflow-runs@5bf9a1dac5c4d041c029f0a8370ddf0c5cb5aeb7  #v2.1
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          delete_workflow_pattern: cleanup
-          retain_days: ${{ github.event.inputs.retain-days || 1 }}
-          keep_minimum_runs: ${{ github.event.inputs.minimum-runs || 1 }}
-
-      - name: Delete workflow runs (Copilot code reviews)
-        uses: Mattraks/delete-workflow-runs@5bf9a1dac5c4d041c029f0a8370ddf0c5cb5aeb7  #v2.1
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          delete_workflow_pattern: copilot | Copilot
-          retain_days: ${{ github.event.inputs.retain-days || 1 }}
-          keep_minimum_runs: ${{ github.event.inputs.minimum-runs || 1 }}
