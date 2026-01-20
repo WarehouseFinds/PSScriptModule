@@ -1,0 +1,38 @@
+# Automatically checks for updates to GitHub Actions and PowerShell modules
+
+version: 2
+updates:
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    open-pull-requests-limit: 5
+
+  # PowerShell modules via requirements.psd1
+  # Note: Dependabot doesn't natively support PowerShell modules
+  # This monitors the requirements.psd1 file for manual updates
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "powershell"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    open-pull-requests-limit: 5
+    ignore:
+      # PowerShell modules are managed via PSDepend
+      # This is primarily for any NuGet packages if added later
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

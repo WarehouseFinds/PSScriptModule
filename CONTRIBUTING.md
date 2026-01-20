@@ -30,19 +30,18 @@ We welcome suggestions for enhancements! Please:
 ### Pull Requests
 
 1. **Fork the repository** and create your branch from `main`
-2. **Follow the project structure**:
+1. **Follow the project structure**:
    - Place public functions in `src/Public/`
    - Place private functions in `src/Private/`
    - Add corresponding Pester tests with `.Tests.ps1` suffix
    - Update documentation in `docs/help/` if needed
-
-3. **Write quality code**:
+1. **Write quality code**:
    - Follow PowerShell best practices
    - Use approved verbs for function names (Get, Set, New, etc.)
    - Include proper comment-based help for all public functions
    - Ensure your code passes PSScriptAnalyzer checks
+1. **Test your changes**:
 
-4. **Test your changes**:
    ```powershell
    # Run all tests
    Invoke-Build Test
@@ -54,19 +53,17 @@ We welcome suggestions for enhancements! Please:
    Invoke-Build Invoke-UnitTests
    ```
 
-5. **Document your changes**:
+1. **Document your changes**:
    - Update the README.md if needed
-    - Generate or update function help sections
-
-6. **Commit your changes**:
+   - Generate or update function help sections
+1. **Commit your changes**:
    - Use clear and meaningful commit messages
    - Follow semantic versioning keywords in commit messages:
      - `+semver: breaking` or `+semver: major` for breaking changes
      - `+semver: feature` or `+semver: minor` for new features
      - `+semver: fix` or `+semver: patch` for bug fixes
      - `+semver: none` or `+semver: skip` to skip version bump
-
-7. **Submit a pull request**:
+1. **Submit a pull request**:
    - Provide a clear description of the changes
    - Reference any related issues
    - Ensure all CI checks pass
@@ -78,21 +75,23 @@ We welcome suggestions for enhancements! Please:
 - PowerShell 7.0 or higher (PowerShell 5.1 minimum)
 - Git
 - Required modules (installed via PSDepend):
-  - InvokeBuild
-  - ModuleBuilder
-  - Pester
-  - PSScriptAnalyzer
-  - PlatyPS
+- InvokeBuild
+- ModuleBuilder
+- Pester
+- PSScriptAnalyzer
+- PlatyPS
 
 ### Setting Up Your Development Environment
 
 1. Clone your fork:
+
    ```bash
    git clone https://github.com/YOUR-USERNAME/PSScriptModule.Template.git
    cd PSScriptModule.Template
    ```
 
-2. Install dependencies:
+1. Install dependencies:
+
    ```powershell
    # Install PSDepend if not already installed
    Install-Module -Name PSDepend -Scope CurrentUser
@@ -101,7 +100,8 @@ We welcome suggestions for enhancements! Please:
    Invoke-PSDepend -Path ./requirements.psd1 -Install -Import -Force
    ```
 
-3. Create a new branch:
+1. Create a new branch:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -135,6 +135,7 @@ Invoke-Build Clean
 - Mock external dependencies
 
 Example test structure:
+
 ```powershell
 Describe 'Get-MyFunction' {
     Context 'When valid input is provided' {
@@ -194,7 +195,7 @@ Version numbers are automatically managed by GitVersion based on commit messages
 Releases are automated through the CI/CD pipeline:
 
 1. Merge pull request to `main` branch
-2. CI/CD pipeline automatically:
+1. CI/CD pipeline automatically:
    - Calculates version number using GitVersion
    - Runs all tests and checks
    - Builds the module
