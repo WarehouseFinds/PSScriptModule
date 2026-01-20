@@ -107,14 +107,28 @@ jobs:
           MODULE_PATH=${{ github.repository }}
           rm README.md
           mv .github/README_template.md README.md
-          sed -i "s|{MODULE_NAME}|$MODULE_NAME|g" README.md
+          sed -i "s|PSScriptModule|$MODULE_NAME|g" README.md
           sed -i "s|{MODULE_DESCRIPTION}|$MODULE_DESCRIPTION|g" README.md
           sed -i "s|{MODULE_PATH}|$MODULE_PATH|g" README.md
+
+      - name: Update SUPPORT.md
+        run: |
+          MODULE_NAME=${{ github.event.repository.name }}
+          sed -i "s/PSScriptModule/$MODULE_NAME/g" .githubSUPPORT.md
 
       - name: Update LICENSE
         run: |
           OWNER=${{ github.repository_owner }}
           sed -i "s/Warehouse Finds/$OWNER/g" LICENSE
+
+      - name: Remove FUNDING.yml
+        run: |
+          rm .github/FUNDING.yml
+
+      - name: Update config.yml in ISSUE_TEMPLATE
+        run: |
+          MODULE_PATH=${{ github.repository }}
+          sed -i "s|WarehouseFinds/PSScriptModule|$MODULE_PATH|g" .github/ISSUE_TEMPLATE/config.yml
 
       - name: Update devcontainer.json
         run: |

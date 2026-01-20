@@ -6,8 +6,8 @@ changelog:
   categories:
     - title: 💥 Breaking Changes
       labels:
-      - breaking
-      - major
+        - breaking
+        - major
     - title: 🚀 Features
       labels:
         - feature

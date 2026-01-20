@@ -1,10 +1,11 @@
-# PSScriptModule.Template
+# PSScriptModule - PowerShell Script Module Template
 
 A production-ready PowerShell script module template designed to streamline the creation, testing, and delivery of enterprise-grade PowerShell modules. This template implements modern DevOps practices,
 automated quality gates, and continuous delivery workflows right out of the box.
 
 [![CI](https://github.com/WarehouseFinds/PSScriptModule/actions/workflows/ci.yml/badge.svg)](https://github.com/WarehouseFinds/PSScriptModule/actions/workflows/ci.yml)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/PSScriptModule.svg)](https://www.powershellgallery.com/packages/PSScriptModule)
+[![Downloads](https://img.shields.io/powershellgallery/dt/PSScriptModule.svg)](https://www.powershellgallery.com/packages/PSScriptModule)
 [![License](https://img.shields.io/github/license/WarehouseFinds/PSScriptModule)](LICENSE)
 
 ## 🎯 Purpose

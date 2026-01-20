@@ -1,4 +1,4 @@
-name: Documentation Improvement
+name: Documentation Update
 description: Suggest improvements to documentation
 title: "[Docs]: "
 labels: ["documentation"]
@@ -29,7 +29,7 @@ body:
       label: Location
       description: Where is the documentation issue located?
       placeholder: |
-        - File/Function: [e.g., Get-PSScriptModuleInfo]
+        - File/Function: [e.g., .src/Public/Get-PSScriptModuleInfo]
         - Section: [e.g., EXAMPLES]
     validations:
       required: true

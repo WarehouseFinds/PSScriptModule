@@ -13,7 +13,7 @@ This document provides guidance for AI coding agents (like GitHub Copilot, Curso
 
 ## Project Structure
 
-```
+```plaintext
 PSScriptModule.Template/
 ├── src/                          # Source code
 │   ├── PSScriptModule.psd1      # Module manifest
@@ -31,12 +31,14 @@ PSScriptModule.Template/
 ## Key Conventions
 
 ### File Naming
+
 - Public functions: `Verb-Noun.ps1` in `src/Public/`
 - Private functions: `VerbNoun.ps1` in `src/Private/`
 - Test files: `*.Tests.ps1` alongside source files
 - Help files: `Verb-Noun.md` in `docs/help/`
 
 ### Function Structure
+
 - Use approved PowerShell verbs (Get, Set, New, Remove, etc.)
 - Include `[CmdletBinding()]` attribute
 - Add comprehensive comment-based help
@@ -44,6 +46,7 @@ PSScriptModule.Template/
 - Follow begin/process/end blocks when appropriate
 
 ### Testing Requirements
+
 - Every function must have corresponding `.Tests.ps1` file
 - Use Pester framework (v5+)
 - Organize tests with Describe/Context/It blocks
@@ -51,6 +54,7 @@ PSScriptModule.Template/
 - Mock external dependencies
 
 ### Code Quality
+
 - Must pass PSScriptAnalyzer with default rules
 - Follow PSScriptAnalyzerSettings.psd1 configuration
 - Check for security issues (injection attacks, etc.)
@@ -77,7 +81,8 @@ Invoke-Build Invoke-Pester            # Run Pester tests
    - Public functions → `src/Public/Verb-Noun.ps1`
    - Private functions → `src/Private/VerbNoun.ps1`
 
-2. **Function Template**:
+1. **Function Template**:
+
    ```powershell
    function Verb-Noun {
        <#
@@ -128,7 +133,8 @@ Invoke-Build Invoke-Pester            # Run Pester tests
    }
    ```
 
-3. **Create Test File**:
+1. **Create Test File**:
+
    ```powershell
    BeforeAll {
        # Import the function
@@ -154,10 +160,10 @@ Invoke-Build Invoke-Pester            # Run Pester tests
 ### When Modifying Existing Code
 
 1. **Verify Tests**: Ensure existing tests still pass
-2. **Update Tests**: Add new tests for new functionality
-3. **Update Help**: Regenerate markdown help if function signature changes
-4. **Check Analysis**: Run PSScriptAnalyzer to verify compliance
-5. **Semantic Versioning**: Include appropriate `+semver:` keyword in commits
+1. **Update Tests**: Add new tests for new functionality
+1. **Update Help**: Regenerate markdown help if function signature changes
+1. **Check Analysis**: Run PSScriptAnalyzer to verify compliance
+1. **Semantic Versioning**: Include appropriate `+semver:` keyword in commits
 
 ### Code Quality Checklist
 
@@ -177,6 +183,7 @@ Before completing any code changes, verify:
 ### Common Patterns
 
 **Error Handling**:
+
 ```powershell
 try {
     # Operation
@@ -188,11 +195,13 @@ catch {
 ```
 
 **Verbose Output**:
+
 ```powershell
 Write-Verbose "Performing action on $Target"
 ```
 
 **Parameter Validation**:
+
 ```powershell
 [Parameter(Mandatory)]
 [ValidateNotNullOrEmpty()]
@@ -202,6 +211,7 @@ $Path
 ```
 
 **Should Process (for destructive operations)**:
+
 ```powershell
 [CmdletBinding(SupportsShouldProcess)]
 param()
@@ -214,11 +224,13 @@ if ($PSCmdlet.ShouldProcess($Target, "Operation")) {
 ### Dependencies
 
 Install required modules via PSDepend:
+
 ```powershell
 Invoke-PSDepend -Path ./requirements.psd1 -Install -Import -Force
 ```
 
 Key dependencies:
+
 - **InvokeBuild**: Build orchestration
 - **Pester**: Testing framework
 - **PSScriptAnalyzer**: Static code analysis
@@ -229,10 +241,10 @@ Key dependencies:
 - Uses GitVersion with GitHub Flow
 - Every PR merge to `main` creates a new release
 - Control version bumps with commit message keywords:
-  - `+semver: major` - Breaking changes (1.0.0 → 2.0.0)
-  - `+semver: minor` - New features (1.0.0 → 1.1.0)
-  - `+semver: patch` - Bug fixes (1.0.0 → 1.0.1)
-  - `+semver: none` - No version change
+    - `+semver: major` - Breaking changes (1.0.0 → 2.0.0)
+    - `+semver: minor` - New features (1.0.0 → 1.1.0)
+    - `+semver: patch` - Bug fixes (1.0.0 → 1.0.1)
+    - `+semver: none` - No version change
 
 ### Testing Commands
 
@@ -258,15 +270,15 @@ Invoke-ScriptAnalyzer -Path ./src -Recurse
 ## Best Practices for AI Agents
 
 1. **Always run tests** after making changes
-2. **Follow existing patterns** in the codebase
-3. **Don't remove or modify** PSScriptAnalyzer suppressions without understanding them
-4. **Update documentation** when changing function signatures
-5. **Use approved verbs** from `Get-Verb` output
-6. **Avoid aliases** in production code (use full cmdlet names)
-7. **Include examples** in help documentation
-8. **Handle errors explicitly** with try/catch blocks
-9. **Add verbose output** for debugging
-10. **Test edge cases** including null/empty inputs
+1. **Follow existing patterns** in the codebase
+1. **Don't remove or modify** PSScriptAnalyzer suppressions without understanding them
+1. **Update documentation** when changing function signatures
+1. **Use approved verbs** from `Get-Verb` output
+1. **Avoid aliases** in production code (use full cmdlet names)
+1. **Include examples** in help documentation
+1. **Handle errors explicitly** with try/catch blocks
+1. **Add verbose output** for debugging
+1. **Test edge cases** including null/empty inputs
 
 ## Resources
 
@@ -279,6 +291,7 @@ Invoke-ScriptAnalyzer -Path ./src -Recurse
 ## Quick Reference
 
 ### File Operations
+
 ```powershell
 # Create new public function
 New-Item -Path ./src/Public/Get-Something.ps1 -ItemType File
@@ -288,6 +301,7 @@ New-Item -Path ./src/Public/Get-Something.Tests.ps1 -ItemType File
 ```
 
 ### Build Operations
+
 ```powershell
 # Clean build
 Invoke-Build Clean
@@ -303,6 +317,7 @@ Invoke-Build -ReleaseType Release
 ```
 
 ### Module Operations
+
 ```powershell
 # Import module for testing
 Import-Module ./src/PSScriptModule.psd1 -Force
