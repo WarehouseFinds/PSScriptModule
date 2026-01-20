@@ -66,7 +66,7 @@ jobs:
         run: cat test-results/codecoverage/report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
       - name: Upload coverage report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: CoverageReport
           path: test-results/codecoverage/report
