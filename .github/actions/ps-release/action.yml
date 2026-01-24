@@ -10,20 +10,12 @@ inputs:
   publish-psgallery:
     description: Publish to PowerShell Gallery
     required: true
-  publish-nugetorg:
-    description: Publish to NuGet.org (not implemented)
-    required: true
   module-list:
     description: Comma-separated list of PowerShell modules to cache
     required: true
 runs:
   using: composite
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v6
-      with:
-        repository: ${{ github.repository }}
-
     - name: Restore cached PowerShell modules
       uses: potatoqualitee/psmodulecache@ee5e9494714abf56f6efbfa51527b2aec5c761b8 #v6.2.1
       with:
@@ -36,10 +28,6 @@ runs:
       with:
         name: build-v${{ inputs.release-version }}
         path: build
-
-    - name: Display structure of downloaded files
-      shell: bash
-      run: ls -R build
 
     - name: Generate release notes
       shell: pwsh
