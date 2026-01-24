@@ -20,52 +20,32 @@ on:
         default: true
 
 jobs:
-  setup:
-    name: Setup
-    runs-on: ubuntu-latest
-    outputs:
-      module-list: ${{ steps.resolve.outputs.module-list }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-      - name: Resolve dependencies
-        id: resolve
-        uses: ./.github/actions/ps-resolve-dependencies
-
-  build:
-    name: Build
-    needs: [setup]
+  release:
+    name: Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      release-version: ${{ steps.build.outputs.release-version }}
+    env:
+      PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          repository: ${{ github.repository }}
+          fetch-depth: 0
+      - name: Resolve dependencies
+        id: resolve
+        uses: ./.github/actions/ps-resolve-dependencies
       - name: Build Module
         id: build
         uses: ./.github/actions/ps-build
         with:
           release-type: ${{ inputs['release-type'] }}
-          module-list: ${{ needs.setup.outputs.module-list }}
-
-  release:
-    name: Release
-    needs: [setup, build]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
+          module-list: ${{ steps.resolve.outputs.module-list }}
       - name: Release Module
         uses: ./.github/actions/ps-release
         with:
           release-type: ${{ inputs['release-type'] }}
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          release-version: ${{ needs.build.outputs.release-version }}
+          release-version: ${{ steps.build.outputs.release-version }}
+          module-list: ${{ steps.resolve.outputs.module-list }}
           publish-psgallery: ${{ inputs.publish-psgallery }}
-          module-list: ${{ needs.setup.outputs.module-list }}
-        env:
-          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
