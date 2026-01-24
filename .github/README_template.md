@@ -2,7 +2,7 @@
 
 {MODULE_DESCRIPTION}
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/{MODULE_PATH}/ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/{MODULE_PATH}/actions/workflows/ci.yml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/{MODULE_PATH}/github-ci.yml?branch=main&logo=github&style=flat-square)](https://github.com/{MODULE_PATH}/actions/workflows/github-ci.yml)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/{MODULE_NAME}.svg)](https://www.powershellgallery.com/packages/{MODULE_NAME})
 [![Downloads](https://img.shields.io/powershellgallery/dt/{MODULE_NAME}.svg)](https://www.powershellgallery.com/packages/{MODULE_NAME})
 [![License](https://img.shields.io/github/license/{MODULE_PATH})](LICENSE)

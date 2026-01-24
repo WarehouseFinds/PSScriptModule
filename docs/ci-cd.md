@@ -501,7 +501,7 @@ git push origin v1.0.0
 **Problem**: Workflow not triggering
 
 ```yaml
-# Solution: Check workflow triggers in .github/workflows/ci.yml
+# Solution: Check workflow triggers in .github/workflows/github-ci.yml
 # Ensure your branch/PR matches trigger conditions
 ```
 

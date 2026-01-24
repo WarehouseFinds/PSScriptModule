@@ -42,7 +42,7 @@ jobs:
   unit-tests:
     name: Unit Tests
     needs: [setup]
-    uses: .github/workflows/ps-analysis-unit-tests.yml
+    uses: .github/workflows/ps-unit-tests.yml
     permissions:
       issues: write
       pull-requests: write
@@ -53,7 +53,7 @@ jobs:
   static-code-analysis:
     name: Static Code Analysis
     needs: [setup]
-    uses: .github/workflows/ps-analysis-static-code.yml
+    uses: .github/workflows/ps-static-code-analysis.yml
     permissions:
       issues: write
       pull-requests: write
@@ -64,7 +64,7 @@ jobs:
   code-injection:
     name: Code Injection
     needs: [setup]
-    uses: .github/workflows/ps-analysis-code-injection.yml
+    uses: .github/workflows/ps-code-injection.yml
     permissions:
       issues: write
       pull-requests: write
@@ -75,7 +75,7 @@ jobs:
   semantic-code-analysis:
     name: Semantic Code Analysis
     needs: [setup]
-    uses: .github/workflows/ps-analysis-codeQL.yml
+    uses: .github/workflows/github-codeQL.yml
     permissions:
       security-events: write
       actions: read
