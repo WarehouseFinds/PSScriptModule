@@ -180,8 +180,6 @@ Comprehensive documentation is available in the [`docs/`](docs/) directory:
 - 🛠️ **[Development Guide](docs/development.md)** - Creating functions, building, testing, and generating help
 - 🔄 **[CI/CD & Publishing Guide](docs/ci-cd.md)** - Automated pipelines, versioning, and PowerShell Gallery publishing
 
-
-
 ## 🤝 Contributing
 
 Contributions are welcome! Whether it’s bug fixes, improvements, or ideas for new features, your input helps make this template better for everyone. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
@@ -198,7 +196,6 @@ If this template saves you time or helps your projects succeed, consider support
 - 🔁 Share it with other PowerShell developers
 - 💬 Provide feedback via issues or discussions
 - ❤️ Sponsor ongoing development via GitHub Sponsors
-
 
 ---
 
