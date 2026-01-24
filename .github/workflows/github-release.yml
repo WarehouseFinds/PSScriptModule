@@ -58,6 +58,14 @@ jobs:
     name: Release
     needs: [setup, build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    with:
+      release-type: ${{ inputs['release-type'] }}
+      release-version: ${{ needs.build.outputs.release-version }}
+      publish-psgallery: ${{ inputs.publish-psgallery }}
+      module-list: ${{ needs.setup.outputs.module-list }}
+    secrets: inherit
     steps:
       - name: Release Module
         uses: ./.github/actions/ps-release
@@ -69,11 +77,3 @@ jobs:
           module-list: ${{ needs.setup.outputs.module-list }}
         env:
           PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
-        permissions:
-          contents: write
-        with:
-          release-type: ${{ inputs['release-type'] }}
-          release-version: ${{ needs.build.outputs.release-version }}
-          publish-psgallery: ${{ inputs.publish-psgallery }}
-          module-list: ${{ needs.setup.outputs.module-list }}
-        secrets: inherit

@@ -52,17 +52,17 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - name: Run Pester Unit Tests
-        uses: ./.github/actions/ps-unit-tests
-        with:
-          module-list: ${{ needs.setup.outputs.module-list }}
     permissions:
       issues: write
       pull-requests: write
       checks: write
     with:
       module-list: ${{ needs.setup.outputs.module-list }}
+    steps:
+      - name: Run Pester Unit Tests
+        uses: ./.github/actions/ps-unit-tests
+        with:
+          module-list: ${{ needs.setup.outputs.module-list }}
 
   static-code-analysis:
     name: Static Code Analysis
