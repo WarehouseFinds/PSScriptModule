@@ -56,8 +56,6 @@ jobs:
       issues: write
       pull-requests: write
       checks: write
-    with:
-      module-list: ${{ needs.setup.outputs.module-list }}
     steps:
       - name: Run Pester Unit Tests
         uses: ./.github/actions/ps-unit-tests
@@ -68,51 +66,49 @@ jobs:
     name: Static Code Analysis
     needs: [setup]
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
     steps:
       - name: Run PSScriptAnalyzer
         uses: ./.github/actions/ps-static-code-analysis
         with:
           module-list: ${{ needs.setup.outputs.module-list }}
-    permissions:
-      issues: write
-      pull-requests: write
-      checks: write
-    with:
-      module-list: ${{ needs.setup.outputs.module-list }}
 
   code-injection:
     name: Code Injection
     needs: [setup]
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      checks: write
     steps:
       - name: Run InjectionHunter
         uses: ./.github/actions/ps-code-injection
         with:
           module-list: ${{ needs.setup.outputs.module-list }}
-    permissions:
-      issues: write
-      pull-requests: write
-      checks: write
-    with:
-      module-list: ${{ needs.setup.outputs.module-list }}
 
   semantic-code-analysis:
     name: Semantic Code Analysis
     needs: [setup]
     runs-on: ubuntu-latest
-    steps:
-      - name: Run CodeQL
-        uses: ./.github/actions/github-codeQL
     permissions:
       security-events: write
       actions: read
       contents: read
       packages: read
+    steps:
+      - name: Run CodeQL
+        uses: ./.github/actions/github-codeQL
 
   build:
     name: Build
     needs: [setup, unit-tests, static-code-analysis, code-injection, semantic-code-analysis]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       release-version: ${{ steps.build.outputs.release-version }}
     steps:
@@ -122,8 +118,3 @@ jobs:
         with:
           release-type: 'Debug'
           module-list: ${{ needs.setup.outputs.module-list }}
-    permissions:
-      contents: write
-    with:
-      release-type: 'Debug'
-      module-list: ${{ needs.setup.outputs.module-list }}
