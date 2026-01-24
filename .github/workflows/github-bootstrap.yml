@@ -1,8 +1,5 @@
-name: Boostrap repository
+name: Boostrap
 run-name: "${{ github.event.repository.name }} | Bootstrap | ${{ github.run_id }} | ${{ github.event_name }}"
-
-# This step triggers after the learner creates a new repository from the template.
-# This workflow updates from step 0 to step 1.
 
 # This will run every time we create push a commit to `main`.
 # Reference: https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
