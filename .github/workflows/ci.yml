@@ -18,25 +18,12 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'docs/**'
       - '.github/**/*'
       - '*'
 
 jobs:
-  changes:
-    name: Label Changes
-    runs-on: [ubuntu-latest]
-    if: github.event_name == 'pull_request'
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-    - name: Labeler
-      id: labeler
-      uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b #v6.0.1
-
-  setup:
-    name: Setup
+  dependencies:
+    name: Dependencies
     runs-on: ubuntu-latest
     outputs:
       module-list: ${{ steps.resolve.outputs.module-list }}
@@ -51,7 +38,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    needs: [setup]
+    needs: [dependencies]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -66,11 +53,11 @@ jobs:
       - name: Run Pester Unit Tests
         uses: ./.github/actions/ps-unit-tests
         with:
-          module-list: ${{ needs.setup.outputs.module-list }}
+          module-list: ${{ needs.dependencies.outputs.module-list }}
 
   static-code-analysis:
     name: Static Code Analysis
-    needs: [setup]
+    needs: [dependencies]
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -82,11 +69,11 @@ jobs:
       - name: Run PSScriptAnalyzer
         uses: ./.github/actions/ps-static-code-analysis
         with:
-          module-list: ${{ needs.setup.outputs.module-list }}
+          module-list: ${{ needs.dependencies.outputs.module-list }}
 
   code-injection:
     name: Code Injection
-    needs: [setup]
+    needs: [dependencies]
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -98,11 +85,11 @@ jobs:
       - name: Run InjectionHunter
         uses: ./.github/actions/ps-code-injection
         with:
-          module-list: ${{ needs.setup.outputs.module-list }}
+          module-list: ${{ needs.dependencies.outputs.module-list }}
 
   semantic-code-analysis:
     name: Semantic Code Analysis
-    needs: [setup]
+    needs: [dependencies]
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -124,7 +111,7 @@ jobs:
 
   build:
     name: Build
-    needs: [setup, unit-tests, static-code-analysis, code-injection, semantic-code-analysis]
+    needs: [dependencies, unit-tests, static-code-analysis, code-injection, semantic-code-analysis]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -141,4 +128,4 @@ jobs:
         uses: ./.github/actions/ps-build
         with:
           release-type: 'Debug'
-          module-list: ${{ needs.setup.outputs.module-list }}
+          module-list: ${{ needs.dependencies.outputs.module-list }}

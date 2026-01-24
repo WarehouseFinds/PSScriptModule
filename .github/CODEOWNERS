@@ -4,16 +4,16 @@
 
 # Default owners for everything in the repo
 # These owners will be requested for review when someone opens a pull request
-*       @marko-stanojevic
+*                           @marko-stanojevic
 
 # Source code
-/src/   @marko-stanojevic
+/src/                       @marko-stanojevic
+/requirements.psd1          @marko-stanojevic
 
 # Build and CI/CD
 *.build.ps1                 @marko-stanojevic
 /.github/workflows/         @marko-stanojevic
-/requirements.psd1          @marko-stanojevic
 /gitversion.yml             @marko-stanojevic
 
 # Tests
-/tests/ @marko-stanojevic
+/tests/                     @marko-stanojevic
