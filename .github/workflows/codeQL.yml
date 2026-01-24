@@ -1,5 +1,5 @@
-name: 'PS CodeQL Analysis'
-run-name: "${{ github.event.repository.name }} | PS CodeQL Analysis | ${{ github.run_id }} | ${{ github.event_name }}"
+name: 'CodeQL'
+run-name: "${{ github.event.repository.name }} | CodeQL | ${{ github.run_id }} | ${{ github.event_name }}"
 on:
   workflow_call:
   schedule:

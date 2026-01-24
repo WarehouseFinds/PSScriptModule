@@ -147,7 +147,7 @@ jobs:
 
       - name: Remove this workflow file
         run: |
-          rm .github/workflows/github-bootstrap-repo.yml
+          rm .github/workflows/bootstrap.yml
 
       - name: Commit changes
         run: |

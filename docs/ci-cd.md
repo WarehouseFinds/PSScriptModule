@@ -99,7 +99,7 @@ For documentation-only changes, the workflow intelligently skips unnecessary job
 # CI automatically skips tests for:
 - *.md files
 - docs/** files
-- .github/** workflow files (except changes to github-ci.yml itself)
+- .github/** workflow files (except changes to ci.yml itself)
 ```
 
 ## Versioning Strategy
@@ -501,7 +501,7 @@ git push origin v1.0.0
 **Problem**: Workflow not triggering
 
 ```yaml
-# Solution: Check workflow triggers in .github/workflows/github-ci.yml
+# Solution: Check workflow triggers in .github/workflows/ci.yml
 # Ensure your branch/PR matches trigger conditions
 ```
 
