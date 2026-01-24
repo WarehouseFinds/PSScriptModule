@@ -61,7 +61,10 @@ Describe 'Get-ModuleMetadata' {
         It 'Should throw when directory has no .psd1 files' {
             Mock Test-Path { $true }
             Mock Get-Item {
-                [PSCustomObject]@{ PSIsContainer = $true }
+                [PSCustomObject]@{
+                    PSIsContainer = $true
+                    FullName      = './empty'
+                }
             }
             Mock Get-ChildItem { @() }
 
