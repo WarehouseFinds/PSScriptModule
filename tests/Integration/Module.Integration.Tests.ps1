@@ -4,34 +4,14 @@ param()
 BeforeAll {
     # Determine the built module path dynamically
     $moduleName = 'PSScriptModule'
-
-    # Try multiple possible locations for the built module
-    $possiblePaths = @(
-        # Standard build output location
-        Join-Path $PSScriptRoot '../../build/out' $moduleName
-        # Alternative: debug build location
-        Join-Path $PSScriptRoot '../../debug' $moduleName
-    )
-
-    $manifestPath = $null
-    foreach ($path in $possiblePaths) {
-        $testPath = if ($path -like '*/src') {
-            Join-Path $path "$moduleName.psd1"
-        } else {
-            Join-Path $path "$moduleName.psd1"
-        }
-
-        if (Test-Path $testPath) {
-            $manifestPath = $testPath
-            break
-        }
-    }
+    $modulePath = Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '../../build/out' -ChildPath $moduleName)
+    $manifestPath = Join-Path -Path $modulePath -ChildPath "$moduleName.psd1"
 
     # Import the built module
     if ($manifestPath -and (Test-Path $manifestPath)) {
         Import-Module $manifestPath -Force -ErrorAction Stop
     } else {
-        throw "Built module not found in any of: $($possiblePaths -join ', '). Run 'Invoke-Build' first."
+        throw "Built module not found at: $manifestPath. Run 'Invoke-Build' first."
     }
 }
 
