@@ -85,7 +85,7 @@ runs:
         if-no-files-found: warn
 
     - name: Commit generated help
-      if: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
+      if: ${{ github.ref_name != 'main' && github.event_name == 'pull_request' }}
       shell: bash
       run: |
         git add docs/help
