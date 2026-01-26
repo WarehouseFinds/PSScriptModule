@@ -23,7 +23,7 @@ runs:
       shell: pwsh
       run: |
         Set-StrictMode -Version Latest
-        Invoke-Build -Task Invoke-UnitTests
+        Invoke-Build -Task UnitTests
 
     - name: Publish Unit Test Results
       if: ${{ runner.os == 'Linux' }}
