@@ -184,12 +184,11 @@ Invoke-Build Build                    # Build only
 
 # Run tests
 Invoke-Build Test                     # Run all tests
-Invoke-Build Invoke-UnitTests         # Unit tests only
+Invoke-Build UnitTests                # Unit tests only
 
 # Code quality
-Invoke-Build Invoke-PSScriptAnalyzer  # Static analysis
-Invoke-Build Invoke-InjectionHunter   # Security scan
-
+Invoke-Build PSScriptAnalyzer         # Static analysis
+Invoke-Build InjectionHunter          # Security scan
 # Generate documentation
 Invoke-Build Export-CommandHelp       # Create help files
 

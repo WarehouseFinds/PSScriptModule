@@ -212,9 +212,9 @@ Invoke-Build Build                    # Compile module
 Invoke-Build Test                     # Run all tests
 
 # Testing tasks
-Invoke-Build Invoke-UnitTests         # Run Pester tests with coverage
-Invoke-Build Invoke-PSScriptAnalyzer  # Run static code analysis
-Invoke-Build Invoke-InjectionHunter   # Run security scans
+Invoke-Build UnitTests                # Run Pester tests with coverage
+Invoke-Build PSScriptAnalyzer         # Run static code analysis
+Invoke-Build InjectionHunter          # Run security scans
 
 # Documentation tasks
 Invoke-Build Export-CommandHelp       # Generate help files
@@ -274,9 +274,9 @@ Remove-Module YourModuleName
 Invoke-Build Test
 
 # Run specific test types
-Invoke-Build Invoke-UnitTests         # Unit tests only
-Invoke-Build Invoke-PSScriptAnalyzer  # Code analysis only
-Invoke-Build Invoke-InjectionHunter   # Security scans only
+Invoke-Build UnitTests                # Unit tests only
+Invoke-Build PSScriptAnalyzer         # Code analysis only
+Invoke-Build InjectionHunter          # Security scans only
 
 # Run specific test file
 Invoke-Pester -Path ./src/Public/Get-Something.Tests.ps1
@@ -389,7 +389,7 @@ It 'Should use mocked API call' {
 
 ```powershell
 # Check coverage
-Invoke-Build Invoke-UnitTests
+Invoke-Build UnitTests
 
 # Review coverage report
 # Open test-results/code-coverage.xml in coverage viewer
@@ -439,9 +439,11 @@ Get-Help Get-Something -Parameter Name
 
 1. **Update comment-based help** in your function
 2. **Regenerate help files**:
+
    ```powershell
    Invoke-Build Export-CommandHelp
    ```
+
 3. **Review generated markdown** in `docs/help/`
 4. **Commit updated documentation**
 
@@ -468,7 +470,7 @@ All code must pass PSScriptAnalyzer rules:
 
 ```powershell
 # Run analysis
-Invoke-Build Invoke-PSScriptAnalyzer
+Invoke-Build PSScriptAnalyzer
 
 # Or directly
 Invoke-ScriptAnalyzer -Path ./src -Recurse -Settings ./tests/PSScriptAnalyzer/PSScriptAnalyzerSettings.psd1
@@ -524,9 +526,11 @@ git commit -m "Update README examples +semver: none"
 1. **Create feature branch**
 2. **Make changes and commit**
 3. **Push to GitHub**:
+
    ```bash
    git push origin feature/my-feature
    ```
+
 4. **Create Pull Request** on GitHub
 5. **Wait for CI checks** to pass:
    - Unit tests

@@ -36,7 +36,7 @@ Enter-Build {
 }
 
 # Synopsis: Analyze the project with PSScriptAnalyzer
-task Invoke-PSScriptAnalyzer {
+task PSScriptAnalyzer {
     if (-not (Test-Path $testOutputPath)) {
         [void] (New-Item -Path $testOutputPath -ItemType Directory)
     }
@@ -57,7 +57,7 @@ task Invoke-PSScriptAnalyzer {
 }
 
 # Synopsis: Scan the project with Injection Hunter
-task Invoke-InjectionHunter {
+task InjectionHunter {
 
     $config = New-PesterConfiguration @{
         Run        = @{
@@ -75,7 +75,7 @@ task Invoke-InjectionHunter {
 }
 
 # Synopsis: Run unit tests and generate code coverage report
-task Invoke-UnitTests {
+task UnitTests {
 
     $container = New-PesterContainer -Path $Script:moduleSourcePath -Data @{ SourcePath = $script:moduleSourcePath }
     $config = New-PesterConfiguration @{
@@ -102,7 +102,7 @@ task Invoke-UnitTests {
 }
 
 # Synopsis: Run integration tests on built module
-task Invoke-IntegrationTests {
+task IntegrationTests {
     if (-not (Test-Path $testOutputPath)) {
         [void] (New-Item -Path $testOutputPath -ItemType Directory)
     }
@@ -136,7 +136,7 @@ task Invoke-IntegrationTests {
 }
 
 # Synopsis: Run all tests
-task Test Invoke-UnitTests, Invoke-PSScriptAnalyzer, Invoke-InjectionHunter
+task Test UnitTests, PSScriptAnalyzer, InjectionHunter
 
 # Synopsis: Generate module help documentation
 task Export-CommandHelp {

@@ -23,7 +23,7 @@ runs:
       shell: pwsh
       run: |
         Set-StrictMode -Version Latest
-        Invoke-Build -Task Invoke-InjectionHunter
+        Invoke-Build -Task InjectionHunter
 
     - name: Publish Code Injection Analysis Results
       uses: EnricoMi/publish-unit-test-result-action@27d65e188ec43221b20d26de30f4892fad91df2f #v2.22.0
