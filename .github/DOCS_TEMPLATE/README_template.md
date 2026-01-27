@@ -7,6 +7,14 @@
 [![Downloads](https://img.shields.io/powershellgallery/dt/{MODULE_NAME}.svg)](https://www.powershellgallery.com/packages/{MODULE_NAME})
 [![License](https://img.shields.io/github/license/{MODULE_PATH})](LICENSE)
 
+## About
+
+{MODULE_NAME} is a PowerShell module that {BRIEF_MODULE_PURPOSE}. It aims to {MODULE_GOALS_OR_OBJECTIVES}.
+
+## Why {MODULE_NAME}?
+
+{MODULE_NAME} is designed to {BRIEF_MODULE_PURPOSE}. It simplifies {SPECIFIC_TASKS_OR_PROCESSES} by providing {KEY_BENEFITS_OR_FEATURES}.
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -36,8 +44,8 @@ Get-Command -Module {MODULE_NAME}
 
 Comprehensive documentation is available in the [`docs/`](docs/) directory:
 
+- 🚀 **[Getting Started](docs/getting-started.md)** - Practical examples and usage scenarios
 - 📘 **[Module Help](docs/)** - Help files for cmdlets and functions
-- 🚀 **[Examples](docs/examples/)** - Practical examples and usage scenarios
 
 ## 🤝 Contributing
 

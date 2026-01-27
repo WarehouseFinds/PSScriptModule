@@ -25,27 +25,28 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           repository: ${{ github.repository }}
           fetch-depth: 0
+
       - name: Resolve dependencies
         id: resolve
         uses: ./.github/actions/ps-resolve-dependencies
+
       - name: Build Module
         id: build
         uses: ./.github/actions/ps-build
         with:
           release-type: ${{ inputs['release-type'] }}
           module-list: ${{ steps.resolve.outputs.module-list }}
+
       - name: Release Module
         uses: ./.github/actions/ps-release
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.NUGETAPIKEY_PSGALLERY }}
         with:
-          release-type: ${{ inputs['release-type'] }}
           release-version: ${{ steps.build.outputs.release-version }}
-          module-list: ${{ steps.resolve.outputs.module-list }}
           publish-psgallery: ${{ inputs.publish-psgallery }}

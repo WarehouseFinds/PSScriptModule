@@ -116,7 +116,7 @@ jobs:
           MODULE_DESCRIPTION="${{ needs.get_repo_state.outputs.description }}"
           MODULE_PATH=${{ github.repository }}
           rm README.md
-          mv .github/README_template.md README.md
+          mv .github/DOCS_TEMPLATE/README_template.md README.md
           sed -i "s|PSScriptModule|$MODULE_NAME|g" README.md
           sed -i "s|{MODULE_NAME}|$MODULE_NAME|g" README.md
           sed -i "s|{MODULE_DESCRIPTION}|$MODULE_DESCRIPTION|g" README.md
@@ -169,8 +169,12 @@ jobs:
 
       - name: Update getting-started.md
         run: |
+          rm docs/getting-started.md
+          mv .github/DOCS_TEMPLATE/getting-started_template.md docs/getting-started.md
           MODULE_NAME=${{ github.event.repository.name }}
-          sed -i "s/PSScriptModule/$MODULE_NAME/g" docs/getting-started.md
+          MODULE_DESCRIPTION="${{ needs.get_repo_state.outputs.description }}"
+          sed -i "s/{MODULE_NAME}/$MODULE_NAME/g" docs/getting-started.md
+          sed -i "s/{MODULE_DESCRIPTION}/$MODULE_DESCRIPTION/g" docs/getting-started.md
 
       - name: Update integration test file
         run: |
