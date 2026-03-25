@@ -1,0 +1,142 @@
+name: PR Summary
+run-name: "${{ github.event.repository.name }} | PR Summary | #${{ github.event.pull_request.number }}"
+permissions: read-all
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  generate:
+    name: Generate PR Summary
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Pre-fill PR body
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const branchName = pr.head.ref;
+
+            // Detect semantic type from branch prefix
+            const typeMap = {
+              'feat': 'feat', 'feature': 'feat', 'add': 'feat',
+              'fix': 'fix', 'bugfix': 'fix', 'hotfix': 'fix', 'patch': 'fix',
+              'security': 'fix', 'sec': 'fix',
+              'breaking': 'breaking', 'major': 'breaking',
+              'docs': 'docs', 'doc': 'docs',
+              'chore': 'chore',
+              'refactor': 'refactor', 'refac': 'refactor', 'cleanup': 'refactor'
+            };
+            const prefix = branchName.split('/')[0];
+            const detectedType = typeMap[prefix] || null;
+
+            // Get changed files
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+
+            // Classify each file by area (mirrors visual signal labels)
+            function classifyFile(filename) {
+              if (/^src\/.+\.Tests\.ps1$/.test(filename))         return 'tests';
+              if (/^src\/.+\.(ps1|psd1)$/.test(filename))         return 'cmdlets';
+              if (/^tests\/Integration\//.test(filename))          return 'tests';
+              if (/^tests\/PSScriptAnalyzer\//.test(filename))     return 'lint';
+              if (/^tests\/InjectionHunter\//.test(filename))      return 'security';
+              if (/^\.github\/workflows\//.test(filename))         return 'ci';
+              if (/^\.github\/actions\//.test(filename))           return 'ci';
+              if (/^\.github\/DOCS_TEMPLATE\//.test(filename))     return 'template';
+              if (/^(AGENTS\.md|\.github\/copilot-instructions\.md)$/.test(filename)) return 'agents';
+              if (/^(docs\/|README\.md|CONTRIBUTING\.md)/.test(filename)) return 'docs';
+              if (/\.build\.ps1$|^GitVersion\.yml$/.test(filename)) return 'build';
+              if (/^\.vscode\//.test(filename))                    return 'vscode';
+              if (/^\.devcontainer\//.test(filename))              return 'devcontainer';
+              if (/^(requirements\.psd1|\.github\/dependabot\.yml)$/.test(filename)) return 'dependencies';
+              if (/^\.github\//.test(filename))                    return 'github';
+              return 'other';
+            }
+
+            const areaLabel = {
+              cmdlets:      '📦 Source',
+              tests:        '🧪 Tests',
+              lint:         '🔍 Lint',
+              security:     '🔒 Security',
+              ci:           '⚙️ CI/CD',
+              build:        '🔨 Build',
+              docs:         '📚 Docs',
+              agents:       '🤖 Agents',
+              template:     '📋 Template',
+              vscode:       '💻 VS Code',
+              devcontainer: '🐳 Dev Container',
+              github:       '🐙 GitHub',
+              dependencies: '📦 Dependencies',
+              other:        '📄 Other'
+            };
+
+            // Group files by area
+            const grouped = {};
+            for (const file of files) {
+              const area = classifyFile(file.filename);
+              if (!grouped[area]) grouped[area] = [];
+              grouped[area].push(file.filename);
+            }
+
+            // Build changed areas table
+            const rows = Object.entries(grouped)
+              .map(([area, areaFiles]) => {
+                const label = areaLabel[area] || area;
+                const fileList = areaFiles.map(f => `\`${f}\``).join('<br>');
+                return `| ${label} | ${fileList} |`;
+              })
+              .join('\n');
+            const changesTable = `| Area | Files |\n|------|-------|\n${rows}`;
+
+            // Build type of change checklist — auto-check detected type
+            const types = [
+              ['feat',     'feat: New feature or enhancement'],
+              ['fix',      'fix: Bug fix'],
+              ['breaking', 'breaking: Breaking change'],
+              ['docs',     'docs: Documentation only'],
+              ['chore',    'chore: Maintenance / tooling'],
+              ['refactor', 'refactor: Refactoring without behavior change']
+            ];
+            const typeChecklist = types
+              .map(([key, label]) => `- [${detectedType === key ? 'x' : ' '}] ${label}`)
+              .join('\n');
+
+            // Compose final body
+            const body = [
+              '## Summary',
+              '',
+              '> ✏️ Auto-generated — replace this with a description of what and why.',
+              '',
+              `**Branch:** \`${branchName}\``,
+              '',
+              '## Changed Areas',
+              '',
+              changesTable,
+              '',
+              '## Type of Change',
+              '',
+              typeChecklist,
+              '',
+              '## Checklist',
+              '',
+              '- [ ] Tests added or updated',
+              '- [ ] `Invoke-Build -Task Test` passes locally',
+              '- [ ] Help updated if a public function was added or changed',
+              '- [ ] No secrets or environment-specific values introduced'
+            ].join('\n');
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              body
+            });

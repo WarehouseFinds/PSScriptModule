@@ -1,13 +1,21 @@
-# Description
+# Pull Request
 
-<!-- Provide a brief description of the changes in this PR -->
-<!-- tip: use GitHub Copilot to generate description -->
+## Summary
+
+<!-- Describe what changed and why -->
 
 ## Type of Change
 
-<!-- Select one by placing an 'x' in the brackets -->
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
-- [ ] Code quality improvement (refactoring, tests, performance)
+- [ ] feat: New feature or enhancement
+- [ ] fix: Bug fix
+- [ ] breaking: Breaking change
+- [ ] docs: Documentation only
+- [ ] chore: Maintenance / tooling
+- [ ] refactor: Refactoring without behavior change
+
+## Checklist
+
+- [ ] Tests added or updated
+- [ ] `Invoke-Build -Task Test` passes locally
+- [ ] Help updated if a public function was added or changed
+- [ ] No secrets or environment-specific values introduced
