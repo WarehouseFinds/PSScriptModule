@@ -13,6 +13,7 @@ runs:
       run: |
         $moduleRequirements = Import-PowerShellDataFile -Path './requirements.psd1'
         $moduleList = foreach ($module in $moduleRequirements.GetEnumerator()) {
+            if ($module.Key -eq 'PSDependOptions') { continue }
             $moduleName = $module.Key
             $moduleInfo = $module.Value
 

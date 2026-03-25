@@ -23,7 +23,7 @@ param (
 )
 
 # Synopsis: Default task
-task . Clean, Build
+Task . Clean, Build
 
 # Setup build environment
 Enter-Build {
@@ -36,7 +36,7 @@ Enter-Build {
 }
 
 # Synopsis: Analyze the project with PSScriptAnalyzer
-task PSScriptAnalyzer {
+Task PSScriptAnalyzer {
     if (-not (Test-Path $testOutputPath)) {
         [void] (New-Item -Path $testOutputPath -ItemType Directory)
     }
@@ -57,7 +57,7 @@ task PSScriptAnalyzer {
 }
 
 # Synopsis: Scan the project with Injection Hunter
-task InjectionHunter {
+Task InjectionHunter {
 
     $config = New-PesterConfiguration @{
         Run        = @{
@@ -75,7 +75,7 @@ task InjectionHunter {
 }
 
 # Synopsis: Run unit tests and generate code coverage report
-task UnitTests {
+Task UnitTests {
 
     $container = New-PesterContainer -Path $Script:moduleSourcePath -Data @{ SourcePath = $script:moduleSourcePath }
     $config = New-PesterConfiguration @{
@@ -102,7 +102,7 @@ task UnitTests {
 }
 
 # Synopsis: Run integration tests on built module
-task IntegrationTests {
+Task IntegrationTests {
     if (-not (Test-Path $testOutputPath)) {
         [void] (New-Item -Path $testOutputPath -ItemType Directory)
     }
@@ -136,10 +136,10 @@ task IntegrationTests {
 }
 
 # Synopsis: Run all tests
-task Test UnitTests, PSScriptAnalyzer, InjectionHunter
+Task Test UnitTests, PSScriptAnalyzer, InjectionHunter
 
 # Synopsis: Generate module help documentation
-task Export-CommandHelp {
+Task Export-CommandHelp {
 
     # Import the module being built and PlatyPS module
     [void] (Import-Module (Join-Path -Path $buildPath -ChildPath "out/$moduleName/$moduleName.psd1") -Force)
@@ -182,7 +182,7 @@ task Export-CommandHelp {
 }
 
 # Synopsis: Build the project
-task Build Clean, {
+Task Build Clean, {
 
     # Copy src directory to ./build folder
     $requestParam = @{
@@ -206,17 +206,19 @@ task Build Clean, {
     # Build Powershell module
     [void] (Import-Module ModuleBuilder)
     $requestParam = @{
-        Path                       = (Join-Path -Path $buildPath -ChildPath "src/$moduleName.psd1")
+        SourcePath                 = (Join-Path -Path $buildPath -ChildPath "src/$moduleName.psd1")
         OutputDirectory            = (Join-Path -Path $buildPath -ChildPath "out/$moduleName")
+        Prefix                     = if (Test-Path (Join-Path -Path $buildPath -ChildPath "src/$moduleName.prefix.ps1")) { (Join-Path -Path $buildPath -ChildPath "src/$moduleName.prefix.ps1") } else { $null }
+        Suffix                     = if (Test-Path (Join-Path -Path $buildPath -ChildPath "src/$moduleName.suffix.ps1")) { (Join-Path -Path $buildPath -ChildPath "src/$moduleName.suffix.ps1") } else { $null }
         SemVer                     = $SemanticVersion
         UnversionedOutputDirectory = $true
-        ErrorAction                = 'Stop'
+        ErrorAction                = [System.Management.Automation.ActionPreference]::Stop
     }
     Build-Module @requestParam
 }
 
 # Synopsis: Create a NuGet package for the module
-task Package {
+Task Package {
     $packageOutputPath = Join-Path -Path $buildPath -ChildPath 'package'
     if (!(Test-Path $packageOutputPath)) {
         [void] (New-Item -Path $packageOutputPath -ItemType Directory -Force)
@@ -227,7 +229,7 @@ task Package {
         SourceLocation     = $packageOutputPath
         PublishLocation    = $packageOutputPath
         InstallationPolicy = 'Trusted'
-        ErrorAction        = 'Stop'
+        ErrorAction        = [System.Management.Automation.ActionPreference]::Stop
     }
     [void] (Register-PSRepository @requestParam)
 
@@ -235,7 +237,7 @@ task Package {
         Path        = (Join-Path -Path $buildPath -ChildPath "out/$moduleName")
         Repository  = "$($moduleName)_local_feed"
         NuGetApiKey = 'ABC123'
-        ErrorAction = 'Stop'
+        ErrorAction = [System.Management.Automation.ActionPreference]::Stop
     }
     [void] (Publish-Module @requestParam)
 
@@ -244,17 +246,17 @@ task Package {
 }
 
 # Synopsis: Publish the module to PSGallery
-task Publish -If ($NugetApiKey) {
+Task Publish -If ($NugetApiKey) {
     $requestParam = @{
         Path        = (Join-Path -Path $buildPath -ChildPath "out/$moduleName")
         NuGetApiKey = $NugetApiKey
-        ErrorAction = 'Stop'
+        ErrorAction = [System.Management.Automation.ActionPreference]::Stop
     }
     [void] (Publish-Module @requestParam)
 }
 
 # Synopsis: Clean up the target build directory
-task Clean {
+Task Clean {
     if (Test-Path $buildPath) {
         Write-Warning "Removing build output folder at '$buildPath'"
         $requestParam = @{

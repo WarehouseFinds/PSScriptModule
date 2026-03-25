@@ -6,7 +6,6 @@
     "editor.renderWhitespace": "all",
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "ms-vscode.powershell",
-
     // File settings
     "[powershell]": {
         "files.trimTrailingWhitespace": true,
@@ -15,11 +14,9 @@
     "files.exclude": {
         "**/.DS_Store": true
     },
-
     // Enable PowerShell Script Analyzer in workspace
     "powershell.scriptAnalysis.enable": true,
     "powershell.scriptAnalysis.settingsPath": "tests/PSScriptAnalyzer/PSScriptAnalyzerSettings.psd1",
-
     // PowerShell extension settings
     "powershell.codeFormatting.autoCorrectAliases": true,
     // Sets the codeformatting options to follow the given indent style in a way that is compatible with PowerShell syntax. For more information about the brace styles please refer to https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81.
@@ -39,8 +36,6 @@
     "powershell.codeFormatting.useCorrectCasing": true,
     // Enables Pester 5 CodeLens features such as Run Test, Debug Test, and Code Coverage.
     "powershell.pester.useLegacyCodeLens": false,
-
-
     // Markdown lint settings
     // https://github.com/PowerShell/PowerShell/blob/master/.markdownlint.json
     "markdownlint.config": {

@@ -116,6 +116,16 @@ jobs:
           }
           [void] (New-ModuleManifest @Params)
 
+      - name: Rename prefix file to match module name
+        run: |
+          MODULE_NAME=${{ github.event.repository.name }}
+          git mv src/PSScriptModule.prefix.ps1 "src/$MODULE_NAME.prefix.ps1"
+
+      - name: Rename suffix file to match module name
+        run: |
+          MODULE_NAME=${{ github.event.repository.name }}
+          git mv src/PSScriptModule.suffix.ps1 "src/$MODULE_NAME.suffix.ps1"
+
       - name: Update README.md
         run: |
           OWNER=${{ github.repository_owner }}
@@ -224,4 +234,3 @@ jobs:
                 }
               }
             }
-
