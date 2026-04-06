@@ -97,6 +97,8 @@ jobs:
 
       - name: Generate new module manifest
         shell: pwsh
+        env:
+          REPO_DESCRIPTION: ${{ needs.get_repo_state.outputs.description }}
         run: |
           # Remove existing module manifest
           [void] (Remove-Item "src/PSScriptModule.psd1")
@@ -109,7 +111,7 @@ jobs:
             CompanyName = "${{ github.repository_owner }}"
             Copyright = "(c) ${{ github.repository_owner }}. All rights reserved."
             RootModule = "${{ github.event.repository.name }}.psm1"
-            Description = "${{ needs.get_repo_state.outputs.description }}"
+            Description = $env:REPO_DESCRIPTION
             ProjectUri = "https://github.com/${{ github.repository }}"
             LicenseUri = "https://github.com/${{ github.repository }}/blob/main/LICENSE"
             ReleaseNotes = "https://github.com/${{ github.repository }}/releases"
