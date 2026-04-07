@@ -1,0 +1,32 @@
+{
+    // MCP server configurations for GitHub Copilot
+    // https://code.visualstudio.com/docs/copilot/chat/mcp-servers
+    "servers": {
+        // GitHub MCP server - provides tools for interacting with GitHub
+        // Requires: GitHub CLI (gh) authenticated via 'gh auth login'
+        // Features: issues, pull requests, repositories, code search, and more
+        "github": {
+            "type": "stdio",
+            "command": "gh",
+            "args": [
+                "mcp",
+                "serve"
+            ]
+        },
+        // Docker MCP server - provides tools for interacting with Docker
+        // Requires: Docker or Rancher Desktop running on the host
+        // Features: container management, image operations, compose, and more
+        "docker": {
+            "type": "stdio",
+            "command": "docker",
+            "args": [
+                "run",
+                "--rm",
+                "-i",
+                "--mount",
+                "type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock",
+                "mcp/docker"
+            ]
+        }
+    }
+}
