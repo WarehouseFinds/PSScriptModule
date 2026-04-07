@@ -74,7 +74,7 @@
     },
 
     // Run once when the container is created
-    "onCreateCommand": "pwsh -NoProfile -Command 'Install-PSResource -RequiredResourceFile /workspaces/PSScriptModule/requirements.psd1 -AcceptLicense -TrustRepository -Verbose'",
+    "onCreateCommand": "pwsh -NoProfile -Command \"if (-not (Get-Module -ListAvailable -Name PSDepend)) { Install-Module -Name PSDepend -Scope CurrentUser -Force }; Invoke-PSDepend -Path '/workspaces/PSScriptModule/requirements.psd1' -Install -Import -Force -Verbose\"",
 
     // Run after container starts (each time)
     "postStartCommand": "pwsh -NoProfile -Command 'Write-Host \"Container started.\"'",
