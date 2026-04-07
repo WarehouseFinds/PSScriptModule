@@ -113,7 +113,7 @@ jobs:
             CompanyName = "${{ github.repository_owner }}"
             Copyright = "(c) ${{ github.repository_owner }}. All rights reserved."
             RootModule = "${{ github.event.repository.name }}.psm1"
-            Description = ($env:REPO_DESCRIPTION -replace "'", "''")
+            Description = $env:REPO_DESCRIPTION
             ProjectUri = "https://github.com/${{ github.repository }}"
             LicenseUri = "https://github.com/${{ github.repository }}/blob/main/LICENSE"
             ReleaseNotes = "https://github.com/${{ github.repository }}/releases"
