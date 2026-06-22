@@ -47,7 +47,7 @@ jobs:
       module-list: ${{ steps.resolve.outputs.module-list }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ github.repository }}
       - name: Resolve dependencies
@@ -68,7 +68,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run Pester Unit Tests
         uses: ./.github/actions/ps-unit-tests
         with:
@@ -85,7 +85,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run PSScriptAnalyzer
         uses: ./.github/actions/ps-static-code-analysis
         with:
@@ -102,7 +102,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run InjectionHunter
         uses: ./.github/actions/ps-code-injection
         with:
@@ -118,7 +118,7 @@ jobs:
       release-version: ${{ steps.build.outputs.release-version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ github.repository }}
           fetch-depth: 0
